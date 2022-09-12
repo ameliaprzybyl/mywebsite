@@ -6,11 +6,11 @@ googleAnalytics: ''
 disqusShortname: ''
 params:
   banner:
-    buttonText: Get Started
+    buttonText: Learn more about me
     # subtitle: |-
     #   A RESPONSIVE SITE TEMPLATE DESIGNED BY HTML5 UP
     #   AND RELEASED UNDER THE CREATIVE COMMONS.
-    title: Hi, my name is Amelia hello
+    title: Hi, my name is Amelia
   blog: {}
   contact:
     address:
@@ -25,7 +25,7 @@ params:
         title: Email
     enable: yes
     phone:
-      - phone: (+44) 7494849917
+      - phone: Available upon request
         title: Phone
   custom_css: []
   custom_js: []
@@ -35,7 +35,7 @@ params:
     text: Please visit [this page](/)
   favicon: favicon.ico
   footer:
-    copyright: Company Name
+    copyright: Content and pictures by Amelia Przybyl
     enable: yes
     quicklinks:
       - alt: HTML5 UP
@@ -76,18 +76,18 @@ params:
       - name: Elements
         url: elements.html
     menu: Menu
-    subtitle: By HTML5 Up
-    title: Forty
+    subtitle: portfolio website
+    title: Amelia Przybyl
   tiles:
     enable: yes
     showcase:
       - image: me.jpg
-        subtitle: Ipsum Dolor Sit Amet hI THERE aras hi hi
-        title: Aliquam
+        subtitle: Short bio
+        title: About me
         url: blogs/aliquam
       - image: pic02.jpg
-        subtitle: Feugiat Amet Tempus trying
-        title: Tempus
+        subtitle: Find out more about my trajectory
+        title: CV
         url: blogs/tempus
       - image: pic03.jpg
         subtitle: Lorem Etiam Nullam
