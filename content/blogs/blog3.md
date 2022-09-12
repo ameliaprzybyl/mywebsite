@@ -18,7 +18,7 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-knitr::include_graphics("/img/blogs/cv.pdf",error=FALSE)
+knitr::include_graphics("static/img/blogs/cv.pdf",error=FALSE)
 ```
 
-![CV](./img/blogs/cv.pdf){width=75%}
+![CV](.static/img/blogs/cv.pdf){width=75%}
