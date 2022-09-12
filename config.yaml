@@ -5,7 +5,7 @@ theme: forty
 googleAnalytics: ''
 disqusShortname: ''
 params:
-  banner:
+  banner: me.jpg
     buttonText: Learn more about me
     # subtitle: |-
     #   A RESPONSIVE SITE TEMPLATE DESIGNED BY HTML5 UP
@@ -86,7 +86,7 @@ params:
         title: About me
         url: blogs/aliquam
       - image: pic02.jpg
-        subtitle: Find out more about my trajectory
+        subtitle: Find out more about my trajectory so far
         title: CV
         url: blogs/tempus
       - image: pic03.jpg
