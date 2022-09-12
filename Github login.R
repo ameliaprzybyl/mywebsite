@@ -10,3 +10,4 @@ usethis::create_github_token()
 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
 
 gitcreds::gitcreds_set()
+

@@ -70,7 +70,7 @@ params:
       - name: Home
         url: '#'
       - name: Blogs
-        url: blogs
+       url: blogs
       - name: Generic Blog
         url: blogs/ipsum
       - name: Elements
