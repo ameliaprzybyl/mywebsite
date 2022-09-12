@@ -82,7 +82,7 @@ params:
     enable: yes
     showcase:
       - image: ![me](./themes/forty/static/img/mr.jpg)
-        subtitle: Ipsum Dolor Sit Amet hI THERE aras
+        subtitle: Ipsum Dolor Sit Amet hI THERE aras hi hi
         title: Aliquam
         url: blogs/aliquam
       - image: pic02.jpg
