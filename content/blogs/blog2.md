@@ -8,10 +8,8 @@ draft: false
 image: pic09.jpg
 keywords: ""
 slug: magna
-title: Magna
+title: Introductory Data Analysis
 ---
-
-
 ```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(
   message = FALSE, 
@@ -28,622 +26,669 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r load-libraries, echo=FALSE}
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
 library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
 library(mosaic)
 library(ggthemes)
-library(GGally)
-library(readxl)
+library(lubridate)
 library(here)
 library(skimr)
 library(janitor)
-library(broom)
+library(vroom)
 library(tidyquant)
-library(infer)
-library(openintro)
 ```
 
-# Youth Risk Behavior Surveillance
+# Rents in San Francsisco 2000-2018
 
-## Load the data
+[Kate Pennington](https://www.katepennington.org/data) created a panel of historic Craigslist rents by scraping posts archived by the Wayback Machine. More about her work,
+
+> [What impact does new housing have on rents, displacement, and gentrification in the surrounding neighborhood? Read our interview with economist Kate Pennington about her article, "Does Building New Housing Cause Displacement?:The Supply and Demand Effects of Construction in San Francisco."](https://matrix.berkeley.edu/research-article/kate-pennington-on-gentrification-and-displacement-in-san-francisco/)
+
+In our case, we have a clean(ish) dataset with about 200K rows that corresponds to Craigslist listings for renting properties in the greater SF area. The data dictionary is as follows
+
+| variable    | class     | description           |
+|-------------|-----------|-----------------------|
+| post_id     | character | Unique ID             |
+| date        | double    | date                  |
+| year        | double    | year                  |
+| nhood       | character | neighborhood          |
+| city        | character | city                  |
+| county      | character | county                |
+| price       | double    | price in USD          |
+| beds        | double    | n of beds             |
+| baths       | double    | n of baths            |
+| sqft        | double    | square feet of rental |
+| room_in_apt | double    | room in apartment     |
+| address     | character | address               |
+| lat         | double    | latitude              |
+| lon         | double    | longitude             |
+| title       | character | title of listing      |
+| descr       | character | description           |
+| details     | character | additional details    |
+
+The dataset was used in a recent [tidyTuesday](https://github.com/rfordatascience/tidytuesday) project.
 
 ```{r}
-data(yrbss)
-glimpse(yrbss)
-```
+# download directly off tidytuesdaygithub repo
 
-Check missing values, summary statistics of numerical variables, and a very rough histogram.
-
-```{r, feeling the data}
-skimr::skim(yrbss)
-```
-
-## Exploratory Data Analysis
-
-### Distribution
-
-
-```{r, eda_on_weight}
-weight <- skimr::skim(yrbss) %>%
-  filter(skim_variable=="weight")
-
-ggplot(yrbss, aes(x=weight, na.rm=TRUE)) +
-   geom_density() 
+rent <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-05/rent.csv', show_col_types = FALSE)
 
 ```
 
-> As we can see from the data, there are 1004 missing observations, the distribution is right skewed with its mean at 68kg and standard deviation at 17.
+## A glimpse
 
-```{r, mutate_and_count}
-yrbss_clean <- yrbss %>% 
-  drop_na(weight) %>%
-  drop_na(physically_active_7d) %>%
-  mutate(physical_3plus = ifelse(physically_active_7d > 2, "yes", "no"))
+8 variables are character, while 9 are numeric. `descr` has most missing values (1975).
 
-#count method
-yrbss_cm <- yrbss_clean %>% 
-  count(physical_3plus)
-##calculating percentage active and inactive with count method
-percentage_active_cm <- yrbss_cm[2,2] / (yrbss_cm[1,2]+ yrbss_cm[2,2])
-percentage_inactive_cm <- 1 - percentage_active_cm
+`date`, `year`, `beds`, `baths`, `room_in_apt` should be int instead of double.
 
-#group by and summarize method (gbsm)
-yrbss_gbsm <- yrbss_clean %>% 
-  group_by(physical_3plus) %>%
-  summarize(n = n())
-##calculating percentage active and inactive with gbsm method
-percentage_active_gbsm <- yrbss_gbsm[2,2] / (yrbss_gbsm[1,2]+ yrbss_gbsm[2,2])
-percentage_inactive_gbsm <- 1 - percentage_active_gbsm
+```{r skim_data}
+# show top 10 rows
+head(rent, n = 10)
+
+# glimpse
+glimpse(rent)
+# skim data
+skimr::skim(rent) %>% 
+  arrange(desc(n_missing))
 ```
 
->Above, we calculated the number of those that are not active for more than three days - 4022 - which constitutes 32.5% of the observations. The number is the same when using both the count method as well as the group by and summarise way.
+## Ranking of Classifieds
 
-### CI: inactive high schoolers
-
-the Confidence Interval for the population proportion of high schoolers that are NOT active 3 or more days per week
-
-```{r, confidence_interval}
-
-sum = yrbss_gbsm[1,2] + yrbss_gbsm[2,2]
-sd = sqrt((sum*percentage_inactive_cm)*(percentage_active_gbsm))
-z = 1.96
-
-#calculating confidence intervals
-CI_low = percentage_inactive_cm-z*sd/sqrt(sum)
-CI_high = percentage_inactive_cm+z*sd/sqrt(sum)
-
-print(CI_low)
-print(CI_high)
+```{r top_cities}
+df_top_twenty <-
+  rent %>%
+    count(city) %>% #to count number of classifieds in each city
+    arrange(desc(n)) %>% #arrange by highest number 
+    slice(1:20) %>%
+    mutate(percentage = n/sum(n)) 
+ggplot(df_top_twenty, aes(x = percentage, y = fct_reorder(city, percentage))) + 
+  geom_col() +
+  theme_bw() + 
+  labs(
+    title = "San Francisco accounts for more than a quarter of all rental classifieds",
+    subtitle = "% of Craigslist listings, 2000-2018",
+    x = "Rental Classifieds Percentage",
+    y = "City",
+    caption = "Source: Pennington. Kate (2018). Bav Area Craigslist Rental Housing Posts 2000-2018") +
+  scale_x_continuous(labels = scales::percent)
 ```
 
->The 95% confidence interval is between -0.593 and 1.24. This confidence interval fully covers the range from 0 to 1, which are the only results that we could observe in real life. This shows us that the data does not give us a reliable method of estimation for the population proportion of high schoolers that are not active for 3 or more days a week.
+## Rentals evolution in San Francisco
 
-### Boxplot: physical_3plus & weight
-
-```{r, boxplot}
-yrbss_clean %>%
-  group_by(physical_3plus, weight) %>%
-  ggplot(aes(x = physical_3plus, y = weight, fill=physical_3plus)) +
-  geom_boxplot() +
-    labs(
-    title = "Boxplot of people active for more than 3 days vs weight",
-    x = "Are they active more than 3 times a week?",
-    y = "Weight")
+```{r sf_median_prices}
+medianPrices <- rent %>%
+    filter(city == "san francisco", beds <= 3) %>%
+    group_by(beds, year) %>%
+    summarize(medianYear = median(price))
+    
+ggplot(medianPrices, aes(year, medianYear, color = factor(beds))) +
+  geom_line() + 
+  facet_wrap(vars(beds), nrow = 1) +
+  theme_bw() + 
+  labs(
+    title = "San Francisco rentals have been steadily increasing",
+    subtitle = "0 to 3-bed listings, 2000-2018",
+    x = "Year",
+    y = "Rental Price",
+    caption = "Source: Pennington. Kate (2018). Bay Area Craigslist Rental Housing Posts 2000-2018") +
+  theme(legend.position = "None")
 ```
 
-> Based on this graph we can infer that there does not seem to be a relationship between weight and activity, which seems counterintuitive. This could point us to the fact that there is in fact another variable that influences your weight instead of physical activity, like for example consumption habits or genetics.
+## Rentals Evolution in the top 12 cities
 
-## Confidence Interval
+```{r rental_4}
+top_twelve_data <- rent %>%
+  count(city) %>% #to count number of classifieds in each city
+  arrange(desc(n)) %>%
+  slice(1:12) 
+top_twelve_cities <- as.vector(top_twelve_data$city)
+top_twelve_cities
 
-```{r, ci_using_formulas}
-#Confidence interval - highly active
-CI_highly_active <- yrbss_clean %>%
-  filter(physical_3plus == "yes") %>%
-  summarize(mean_weight = mean(weight, na.rm=TRUE),
-            std_dev_weight = sd(weight, na.rm=TRUE),
-            sample_size = n(),
-            z = 1.96,
-            CI_high = mean_weight + z * std_dev_weight / sqrt(sample_size),
-            CI_low = mean_weight - z * std_dev_weight / sqrt(sample_size)
-            )
-
-print(CI_highly_active)
-
-#Confidence interval - not active
-CI_not_active <- yrbss_clean %>%
-  filter(physical_3plus == "no") %>%
-  summarize(mean_weight = mean(weight, na.rm=TRUE),
-            std_dev_weight = sd(weight, na.rm=TRUE),
-            sample_size = n(),
-            z = 1.96,
-            CI_high = mean_weight + z * std_dev_weight / sqrt(sample_size),
-            CI_low = mean_weight - z * std_dev_weight / sqrt(sample_size)
-            )
-
-print(CI_not_active)
-
+rent %>%
+  filter(city %in% top_twelve_cities) %>%
+  group_by(year, city) %>%
+  summarize(median_price = median(price)) %>%
+ggplot(aes(year, median_price, color = factor(city))) +
+  geom_line() +
+  facet_wrap(vars(city)) +
+  labs(
+  title = "Rental prices for flats in the Bay Area",
+  x = "Year",
+  y = "Rental Price",
+  caption = "Source: Pennington. Kate (2018). Bay Area Craigslist Rental Housing Posts 2000-2018") +
+  theme(legend.position = "None")
 ```
 
+## Conclusion
 
-## Hypothesis test with formula
+What can you infer from these plots? Don't just explain what's in the graph, but speculate or tell a short story (1-2 paragraphs max).
 
+> There has been a overall increase in rental prices in the Bay Area between 2000 and 2018. This reflects the tech boom in the Bay Area. In particular, Palo Alto, the birthplace of Sillicon Valley, has experienced the highest rental increase. On the other hand, cities like Santa Rosa and San Jose, have experienced relatively lower rental increase. This increase can probably be accounted for by inflation adjustments. Most cities experienced a dip in prices around 2008-2010. We believe this reflects the housing bubble burst of 2008, which triggered a global financial crisis. 
 
-```{r, t_test_using_R}
+# Analysis of movies- IMDB dataset
 
-t.test(weight ~ physical_3plus, data = yrbss_clean)
+The data is taken from the [Kaggle IMDB 5000 movie dataset](https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset)
 
-```
+Besides the obvious variables of `title`, `genre`, `director`, `year`, and `duration`, the rest of the variables are as follows:
 
-> The null hypothesis is that the true difference in means between group yes and no equals to zero, the alternative hypothesis is that it does not equal zero. As the p value is smaller than 0.05, we can reject the null hypothesis.
+-   `gross` : The gross earnings in the US box office, not adjusted for inflation
+-   `budget`: The movie's budget
+-   `cast_facebook_likes`: the number of facebook likes cast members received
+-   `votes`: the number of people who voted for (or rated) the movie in IMDB
+-   `reviews`: the number of reviews for that movie
+-   `rating`: IMDB average rating
 
-## Hypothesis test with `infer`
+## Glimpse
 
-Initialize the test: 
+-   As shown below, there is no missing values or duplicate entries <!-- not sure -->
 
-```{r, calc_obs_difference}
-obs_diff <- yrbss_clean %>%
-  specify(weight ~ physical_3plus) %>%
-  calculate(stat = "diff in means", order = c("yes", "no"))
+-   However, some movies are recorded for multiple times with some inconsistent feature values (same title).
 
-```
+    -   inconsistent features: `cast_facebook_likes`, `votes`, `reviews`
 
-Simulate the test on the null distribution: 
-
-```{r, hypothesis_testing_using_infer_package}
-
-null_dist <- yrbss_clean %>%
-  # specify variables
-  specify(weight ~ physical_3plus) %>%
-  
-  # assume independence, i.e, there is no difference
-  hypothesize(null = "independence") %>%
-  
-  # generate 1000 reps, of type "permute"
-  generate(reps = 1000, type = "permute") %>%
-  
-  # calculate statistic of difference, namely "diff in means"
-  calculate(stat = "diff in means", order = c("yes", "no"))
-
-```
-
-Visualize the null distribution: 
-
-```{r}
-ggplot(data = null_dist, aes(x = stat)) +
-  geom_histogram()
-
-```
-
-The p-value for the hypothesis test: 
-
-```{r}
-
-null_dist %>% visualize() +
-  shade_p_value(obs_stat = obs_diff, direction = "two-sided")
-
-null_dist %>%
-  get_p_value(obs_stat = obs_diff, direction = "two_sided")
-
-```
-
->As the p value is on the right side of the observations, we can reject the null hypothesis.
-
-
-# IMDB ratings: Differences between directors
-
-```{r directors, echo=FALSE, out.width="100%"}
-knitr::include_graphics(here::here("images", "directors.png"), error = FALSE)
-```
-
-
-> Before anything, write down the null and alternative hypotheses, as well as the resulting test statistic and the associated t-stat or p-value. At the end of the day, what do you conclude?
-
-Load the data and examine its structure: 
-
-```{r load-movies-data}
+```{r overview_imdb}
 movies <- read_csv(here::here("data", "movies.csv"))
 glimpse(movies)
+# overview of the dataset
+## the total observation, variables' types, 
+skimr::skim(movies)
+
+# check duplicates
+distinct(movies) %>% 
+  summarize(n_tot_obs = n())
+
+# duplicated titles
+movies %>% 
+  summarize(n_unique_titles = n_distinct(title))
+
+# which features are consistent? 
+movies %>% 
+  group_by(title) %>% 
+  mutate(n_title = n()) %>% 
+  filter(n_title > 1) %>% 
+  summarize_all(n_distinct) %>% 
+  summarize_all(sd)
 ```
 
-> The null hypothesis is that the true difference in mean ratings between movies directed by Steven Spielberg and Tim Burton is 0. Conversely, the alternative hypothesis is that the true difference in means is not 0. 
+Over 2k movies are Comedy, Action, or Drama.
 
-```{r reproducing_imdb}
-# Reproducing the plot
-movies2<-movies %>% 
-  filter(director %in% c("Steven Spielberg", "Tim Burton")) %>% 
-  select(director, rating) %>% 
+```{r cnt_by_genre_desc}
+# Produce a table with the count of movies by genre, ranked in descending order
+movies %>% 
+  group_by(genre) %>% 
+  summarize(n_movies = n_distinct(title)) %>% 
+  arrange(desc(n_movies))
+```
+
+The average gross, budget, and return on budget by genre are shown below.
+
+```{r avg_gross_budget_by_genre}
+# average gross and budget
+movies %>% 
+  distinct(title, .keep_all = TRUE) %>% 
+  group_by(genre) %>% 
+  summarize(avg_gross = mean(gross), avg_budget = mean(budget)) %>% 
+  mutate(return_on_budget = avg_gross / avg_budget) %>% 
+  arrange(desc(return_on_budget))
+```
+
+The top 15 directors who have created the highest gross revenue in the box office, including the total, mean, median, and standard deviation value of gross amount per director.
+
+```{r top_15_directors}
+# top 15 directors
+movies %>% 
+  distinct(title, .keep_all = TRUE) %>% 
   group_by(director) %>% 
-  summarise(mean = mean(rating, na.rm = TRUE), 
-            sd = sd(rating, na.rm = TRUE), 
-            cnt = n(), 
-            t_critical = qt(p = 0.025, df = cnt - 1, lower.tail=FALSE),
-            se = sd/sqrt(cnt), 
-            margin_of_error = se * t_critical,
-            lower_ci = mean - margin_of_error, 
-            upper_ci = mean + margin_of_error)
+  summarize(tot_gross = sum(gross), avg_gross = mean(gross), med_gross = median(gross), std_gross = sd(gross)) %>% 
+  slice_max(order_by = tot_gross, n = 15)
+```
 
-ggplot(movies2, aes(x=mean,y=director)) + 
-  annotate("rect",
-           ymin = -Inf, ymax = Inf,
-           xmin = max(movies2$lower_ci), xmax = min(movies2$upper_ci), fill = "lightgrey"
-  ) + 
-  geom_errorbar(aes(xmin=lower_ci, 
-                    xmax=upper_ci,colour=director,y=fct_reorder(director,mean))) + 
-  geom_text(aes(x = mean, y = director, label = round(mean, 2)), size = 4) + 
-  geom_text(aes(x = upper_ci, y = director, label = round(upper_ci, 2)), size = 3) + 
-  geom_text(aes(x = lower_ci, y = director, label = round(lower_ci, 2)), size = 3) + 
+Distribution of ratings by genre
+
+```{r rating_distr_by_genre}
+movies %>% 
+  distinct(title, .keep_all = TRUE) %>% 
+  group_by(genre) %>% 
+  summarize(avg_r = mean(rating), min_r = min(rating), max_r = max(rating), med_r = median(rating), std_r = sd(rating), n_movies = n())
+
+movies %>% 
+  distinct(title, .keep_all = TRUE) %>% 
+  ggplot(aes(x = rating)) + 
+  geom_density(alpha = 0.2, fill = "grey") + 
+  facet_wrap(~ genre) + 
+  theme_bw() + 
   labs(
-    title = "Do Spielberg and Burton have the same mean IMDB ratings?",
-    subtitle = "95%confidence intervals overlap", 
-    x = "Mean IMBD Rating", 
-    y = "Director") + 
-  theme(legend.position = "none", 
-        axis.text = element_text(size = 8), 
-        axis.title = element_text(size = 8), 
-        plot.title = element_text(size = 10), 
-        panel.background = element_rect(fill = "white", color = "black"), 
-        panel.grid = element_line(colour = "light grey"))
+    title = "Movie ratings distribution by genre",
+    x = "Rating", 
+    y = "Density", 
+    caption = "Source: https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset")
+```
 
+## Finding Predictors for Gross - Graphs
 
-# Testing the hypothesis
-movies3<-movies%>%
-filter(director %in% c("Steven Spielberg", "Tim Burton"))%>%
-  select(director, rating)
+-   The number of facebook likes that the cast has received does not seem to be a suitable predictor of gross income, the gross value is widely spread for movies of the same likes amount.
+-   The Y denotes the dependent variable (gross), the X denotes the independent variable (cast_facebook_likes).
 
-t.test(rating ~director , data=movies3)
+```{r, gross_on_fblikes}
+movies %>% 
+  group_by(title) %>% 
+  summarize(gross = mean(gross), cast_facebook_likes = mean(cast_facebook_likes)) %>% 
+  ggplot(aes(x = cast_facebook_likes, y = gross)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+-   Budget is not likely to be a good predictor of gross.
+
+```{r, gross_on_budget}
+movies %>% 
+  group_by(title) %>% 
+  summarize(gross = mean(gross), budget = mean(budget)) %>% 
+  ggplot(aes(x = budget, y = gross)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+-   There seems to be a positive correlation between gross and rating within some particular genres - **Action**, **Adventure**, **Biography**, **Comedy**, **Drama**.
+-   But the rating still seems to be a bad predictor for gross among the whole dataset.
+
+## Strange things in the dataset:
+
+duplicate entries - several movies have duplicate records with inconsistent records. - When working on the above tasks, we took only one records into analysis and drop the others if the inspected feature was consistent (e.g., `gross`, `rating`, etc.). - If the inspected feature was inconsistent (`cast_facebook_likes`, `votes`, `reviews`), we used the average value for analysis.
+
+```{r, gross_on_rating}
+movies %>% 
+  group_by(title, genre) %>% 
+  summarize(gross = mean(gross), rating = mean(rating)) %>% 
+  ggplot(aes(x = rating, y = gross)) + 
+  geom_point(alpha = .2) + 
+  facet_wrap(~genre) + 
+  geom_smooth(method = "lm", se = FALSE)
+
+movies %>% 
+  group_by(title, genre) %>% 
+  summarize(gross = mean(gross), rating = mean(rating)) %>% 
+  ggplot(aes(x = rating, y = gross)) + 
+  geom_point(alpha = .2)
+```
+
+# Returns of financial stocks
+
+> useful material [finance data sources](https://mam2023.netlify.app/reference/finance_data/).
+
+```{r load_nyse_data, message=FALSE, warning=FALSE}
+nyse <- readr::read_csv(here::here("data","nyse.csv"))
+```
+
+## The number of companies per sector
+
+```{r companies_per_sector}
+#Understanding the data
+head(nyse)
+
+#Creating a table that shows the number of companies per sector, in descending order
+descending_sector <- nyse %>%
+  dplyr::group_by(sector) %>%
+  count(sector) %>%
+  arrange(desc(sector))
+descending_sector
+
+#Creating a bar plot with the number of companies per sector, in descending order
+
+ggplot(descending_sector, aes(x=reorder(sector, -n), y = n)) + 
+  geom_bar(stat = "identity") +
+  labs(title = "Number of companies by sector",
+    x = "Sector",
+    y = "Number of companies")
+```
+
+Next, let's choose some stocks and their ticker symbols and download some data. You **MUST** choose 6 different stocks from the ones listed below; You should, however, add `SPY` which is the SP500 ETF (Exchange Traded Fund).
+
+## Picking stocks
+
+Stocks we chose: `AAPL`, `JPM`, `ANF`, `TSLA`, `XOM`, `SPY`
+
+```{r get_price_data, message=FALSE, warning=FALSE, cache=FALSE}
+
+myStocks <- c("AAPL","JPM","ANF","TSLA","XOM","SPY" ) %>%
+  tq_get(get  = "stock.prices",
+         from = "2011-01-01",
+         to   = "2022-08-31") %>%
+  group_by(symbol) 
+
+glimpse(myStocks) # examine the structure of the resulting data frame
+```
+
+## Daily and monthly returns.
+
+```{r calculate_returns, message=FALSE, warning=FALSE, cache=TRUE}
+#calculate daily returns
+myStocks_returns_daily <- myStocks %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "daily", 
+               type       = "log",
+               col_rename = "daily_returns",
+               cols = c(nested.col))  
+
+#calculate monthly  returns
+myStocks_returns_monthly <- myStocks %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "monthly", 
+               type       = "arithmetic",
+               col_rename = "monthly_returns",
+               cols = c(nested.col)) 
+
+#calculate yearly returns
+myStocks_returns_annual <- myStocks %>%
+  group_by(symbol) %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "yearly", 
+               type       = "arithmetic",
+               col_rename = "yearly_returns",
+               cols = c(nested.col))
+```
+
+Summarizing monthly returns for each of the stocks and `SPY`; min, max, median, mean, SD.
+
+```{r summarise_monthly_returns}
+monthly_returns_summary <- myStocks_returns_monthly %>% 
+  group_by(symbol) %>% 
+  summarise(mean_monthly_return = mean (monthly_returns, na.rm=TRUE),
+      median_monthly_return = median (monthly_returns, na.rm=TRUE),
+      sd_monthly_return = sd (monthly_returns, na.rm=TRUE),
+      min_monthly_return = min (monthly_returns, na.rm=TRUE),
+      max_monthly_return = max (monthly_returns, na.rm=TRUE))
+monthly_returns_summary
+```
+
+Density plot for each of the stocks:
+
+```{r density_monthly_returns}
+plot1 <- myStocks_returns_monthly %>%
+  group_by(symbol) %>% 
+  ggplot(aes(x = monthly_returns)) +
+   facet_wrap(~symbol, scales = "free")+
+   geom_density()
+plot1
+```
+
+> We can see that most plots, apart from Apple and Tesla follow a normal distribution. We can also determine that TSLA is the stock with the highest risk. Not only is the distribution heavily skewed right, but the monthly retuns on the most likely return are lower than zero. XOM on the other hand is the least risky stock, as it's density plot is heavily concentrated amongst one value, 0. Therefore we can infer that it's variability is fairly low.
+
+## Risk & Return
+
+```{r risk_return_plot}
+plot2 <- ggplot(data = monthly_returns_summary, mapping = aes(x = sd_monthly_return, y = mean_monthly_return)) +
+   geom_point() +
+   ggrepel::geom_text_repel(aes(label=symbol))+
+   labs(title = "Risk/return by stock",
+        x = "Risk",
+        y = "Return")
+plot2
+```
+
+> As we can see based on this plot, higher return is typically correlated with higher risk. However, some stocks, like for example ANF, have higher risk without there being a significant increase in the returns. As an investor, you can use this graph to determine not to invest in a stock like ANF.
+
+# On your own: Spotify
+
+<!-- Spotify have an API, an Application Programming Interface. APIs are ways for computer programs to talk to each other. So while we use Spotify app to look up songs and artists, computers use the Spotify API to talk to the spotify server. There is an R package that allows R to talk to this API: [`spotifyr`](https://www.rcharlie.com/spotifyr/). One of your team members, need to sign up and get a [Spotify developer account](https://developer.spotify.com/dashboard/) and then you can download data about one's Spotify usage. A detailed article on how to go about it can be found here [Explore your activity on Spotify with R and *spotifyr*](https://towardsdatascience.com/explore-your-activity-on-spotify-with-r-and-spotifyr-how-to-analyze-and-visualize-your-stream-dee41cb63526) -->
+
+<!-- If you do not want to use the API, you can download a sample of over 32K songs by having a look at <https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-01-21/readme.md> -->
+
+```{r, download_spotify_data}
+
+spotify_songs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+
 
 ```
 
-> Results obtained from the t-series test give a p-value of 1%. As it is well below the critical value of 5%, the null hypothesis can be rejected and the alternative hypothesis accepted.
+The data dictionary can be found below
 
-# Omega Group plc- Pay Discrimination
+| **variable**             | **class** | **description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|-------------------|-------------------|----------------------------------|
+| track_id                 | character | Song unique ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| track_name               | character | Song Name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| track_artist             | character | Song Artist                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| track_popularity         | double    | Song Popularity (0-100) where higher is better                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| track_album_id           | character | Album unique ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| track_album_name         | character | Song album name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| track_album_release_date | character | Date when album released                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| playlist_name            | character | Name of playlist                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| playlist_id              | character | Playlist ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| playlist_genre           | character | Playlist genre                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| playlist_subgenre        | character | Playlist subgenre                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| danceability             | double    | Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.                                                                                                                                                                                                                                                                       |
+| energy                   | double    | Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.                                                                                                                          |
+| key                      | double    | The estimated overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on. If no key was detected, the value is -1.                                                                                                                                                                                                                                                                                                                            |
+| loudness                 | double    | The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typical range between -60 and 0 db.                                                                                                                                                                                       |
+| mode                     | double    | Mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.                                                                                                                                                                                                                                                                                                                                                    |
+| speechiness              | double    | Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks. |
+| acousticness             | double    | A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.                                                                                                                                                                                                                                                                                                                                                                                       |
+| instrumentalness         | double    | Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.                                                                                                                 |
+| liveness                 | double    | Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.                                                                                                                                                                                                                                                                                            |
+| valence                  | double    | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).                                                                                                                                                                                                                                                                  |
+| tempo                    | double    | The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration.                                                                                                                                                                                                                                                                                                                         |
+| duration_ms              | double    | Duration of song in milliseconds                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
-## Loading the data
+<!-- In this dataset, there are only 6 types of `playlist_genre` , but we can still try to perform EDA on this dataset. -->
 
-```{r load_omega_data}
-omega <- read_csv(here::here("data", "omega.csv"))
-glimpse(omega) # examine the data frame
+<!-- Produce a one-page summary describing this dataset. Here is a non-exhaustive list of questions: -->
+
+<!-- 1.  What is the distribution of songs' popularity (`track_popularity`). Does it look like a Normal distribution? -->
+
+<!-- 2.  There are 12 [audio features](https://developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object) for each track, including confidence measures like `acousticness`, `liveness`, `speechines`and `instrumentalness`, perceptual measures like `energy`, `loudness`, `danceability` and `valence` (positiveness), and descriptors like `duration`, `tempo`, `key`, and `mode`. How are they distributed? can you roughly guess which of these variables is closer to Normal just by looking at summary statistics? -->
+
+<!-- 3.  How are `job_satisfaction` and `work_life_balance` distributed? Don't just report counts, but express categories as % of total -->
+
+<!-- 4.  Is there any relationship between `valence` and `track_popularity`? `danceability` and `track_popularity` ? -->
+
+<!-- 5.  `mode` indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0. Do songs written on a major scale have higher `danceability` compared to those in minor scale? What about `track_popularity`? -->
+
+## Popularity normal distribution
+
+```{r spotify_pop_distr}
+
+ggplot(spotify_songs)+aes(x=track_popularity)+geom_histogram(binwidth=5)
+
+spotify_songs_no0<-filter(spotify_songs,track_popularity>0)
+ggplot(spotify_songs_no0)+aes(x=track_popularity)+geom_histogram(binwidth=5)
 ```
 
-## Relationship Salary - Gender ?
+> The distribution appears close to normal for track_popularity between 20 to 100. However, a spike can be observed for songs with little to no popularity. From the sample data of over 32000 songs, X have 0 track_popularity. The second graph generated excludes those songs from the dataset. The normal distribution can be observed with more ease.
 
-```{r, confint_single_variables}
-# Summary Statistics of salary by gender
-mosaic::favstats (salary ~ gender, data=omega)
+## Distribution of the 12 audio features
 
-# Dataframe with two rows (male-female) and having as columns gender, mean, SD, sample size, 
-# the t-critical value, the standard error, the margin of error, 
-# and the low/high endpoints of a 95% condifence interval
+```{r audio_12}
+ggplot(spotify_songs)+aes(x=acousticness)+geom_histogram(binwidth=0.05) # skewed right
+
+summary(spotify_songs)
+
+ggplot(spotify_songs)+aes(x=valence)+geom_histogram() #  closest to normal
+
+ggplot(spotify_songs)+aes(x=tempo)+geom_histogram() # summary data suggests close to normal but fails to pick up the shape
+```
+
+> The audio features vary in terms of distributions. Most, such as acousticness below are skewed.
+
+> From the summary, we can try determining which of the features is closer to normal. A 'perfect' normal distribution has equal mean and median, the lower and upper interquartile range should have equal distance to the median. Likewise, the distance from the min value --\> mean distance should equal the mean --\> max value distance. The feature closest to these properties is the valence. Illustrated below, we can see it follows a normal-type distriution. Conversely, the tempo also has features close to the theoretical one. However, it appears to have a primary and secondary peak which is not a characteristic of normal curves. The summary can therefore be used as an approximation of the distribution type but cannot pick up more complex characteristics.
+
+## Track popularity relationship
+
+> There does not appear to be a relationship between valence and track_popularity.
+
+```{r valence_relationship}
+ggplot(spotify_songs)+aes(x=valence, y=track_popularity)+geom_point()
+```
+
+> Very few songs have danceability under 0.25. There appears to be a very weak positive correlation between track_popularity and danceability. The most popular songs have danceability between 0.5 and 0.8. However, it is also the danceability level of most songs, many off which are not popular.
+
+```{r danceability_relationship}
+ggplot(spotify_songs)+aes(x=danceability, y=track_popularity)+geom_point()
+```
+
+## Major and minor modality
+
+```{r modality_major_minor}
+filter(spotify_songs,mode==1)%>%
+summarise(mean(danceability),mean(track_popularity))
+
+filter(spotify_songs,mode==0)%>%
+summarise(mean(danceability),mean(track_popularity))
+
+# distribution of danceability and popularity of each mode
+library(patchwork)
+p1 <- ggplot(data = spotify_songs) + 
+  aes(x = danceability, color = factor(mode)) + 
+  geom_density()
+p2 <- ggplot(data = spotify_songs) + 
+  aes(x = track_popularity, color = factor(mode)) + 
+  geom_density()
+p1 + p2
+```
+
+Songs in minor modality are slightly more danceable than major ones but also slightly less popular.
+
+# Challenge 1: Replicating a chart
+
+```{r read_data}
+# Read Data ---------------------------------------------------------------
+#
+rent <- readr::read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-05/rent.csv'
+)
+```
+
+```{r challenge_1, message=FALSE, warnings=FALSE}
+library(DataCombine)
+
+rent
+top_twelve_data <- rent %>%
+  count(city) %>% #to count number of classifieds in each city
+  arrange(desc(n)) %>%
+  slice(1:12) 
+top_twelve_cities <- as.vector(top_twelve_data$city)
+top_twelve_cities
+
+mean_price_each_year <- rent %>%
+    filter(beds <= 2, city %in% top_twelve_cities) %>%
+    group_by(city, beds, year) %>%
+    summarize(median_price = median(price))
+mean_price_each_year  
+
+cumulative_percentage_change <- mean_price_each_year %>%
+  group_by(city, beds) %>%
+  mutate(percent_change = (median_price/lag(median_price))) %>% 
+  mutate(percent_change = ifelse(is.na(percent_change), 1, percent_change)) %>%
+  mutate(cumulative_percent_change = cumprod(percent_change))
+cumulative_percentage_change
+
+ggplot(cumulative_percentage_change,aes(x = year, y = cumulative_percent_change,color= city)) + 
+  geom_line() + 
+  facet_grid(beds ~ city,scales= "free_y") + 
+  theme_bw(base_size = 9)  +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 90)) + 
+  scale_y_continuous(labels = scales::percent_format(scale = 100))  + 
+  scale_x_continuous(breaks = seq(2005, 2018, by = 5)) + 
+  labs(title = "Cumulative % change in 0,1, and 2-bed rentals in Bay Area", 
+       subtitle = "2000-2018")
 
 ```
 
+# Challenge 2: 2016 California Contributors plots
 
-> From this basic analysis we can see that Males have a higher salary on average, although further analysis must be done to determine whether this difference is significant. Females have more varied salaries, however they do also have a larger sample size.
+## Top 10 cities for Hillary and Trump
 
+> The top ten cities in highest amounts raised in political contributions in California during the 2016 US Presidential election.
 
-```{r, hypothesis_testing_1}
-# hypothesis testing using t.test() 
-t.test(salary ~ gender, data=omega)
-
-# hypothesis testing using infer package
-
-library(infer)
-set.seed(1234)
-pub_private_null <- omega %>% 
-     specify(salary ~ gender) %>% 
-     hypothesize(null = "independence") %>% 
-     generate(reps = 1000, type = "permute") %>% 
-     calculate(stat = "diff in means", 
-                              order = c("female", "male"))
-pub_private_null %>% visualize()
-observed_difference <- mean(omega$salary) - mean(omega$gender)
-
-#p-value too small to obtain
-
+```{r load_pkg}
+library(patchwork)
+library(tidytext)
 ```
 
+```{r challenge_2, message=FALSE, warnings=FALSE}
 
-> With a P value below 0.05, we can determine that the result is statistically significant. We can say at the confidence interval, there is enough evidence to reject null hypothesis and say that there is a difference between mean salaries of male and female employees.
+CA_contributors_2016 <- vroom::vroom(here::here("data","CA_contributors_2016.csv"))
+glimpse(CA_contributors_2016)
+zipcodes <- vroom::vroom(here::here("data","zip_code_database.csv"))
+zipcodes <- mutate(zipcodes, zip = as.double(zip))
+contributors <- left_join(CA_contributors_2016, zipcodes, by = "zip")
+hillary <- contributors %>%
+  filter(cand_nm == "Clinton, Hillary Rodham") %>%
+  group_by(primary_city) %>%
+  summarize(contb_receipt_amt = sum(contb_receipt_amt)) %>%
+  slice_max(order_by = contb_receipt_amt, n = 10) %>%
+  mutate(city = fct_reorder(primary_city, contb_receipt_amt, max))
+#hillary
+p1 <- ggplot(hillary, aes(contb_receipt_amt, city)) +
+  geom_col(fill = "blue") + 
+  labs(title = "Clinton, Hillary Rodham",
+   x = NULL,
+   y = NULL) + 
+  theme_bw() + 
+  scale_x_continuous(labels = scales::dollar_format()) +
+  theme(text = element_text(size = 9),element_line(size =1))
 
-## Relationship Experience - Gender?
+#p1
 
-At the board meeting, someone raised the issue that there was indeed a substantial difference between male and female salaries, but that this was attributable to other reasons such as differences in experience. A questionnaire send out to the 50 executives in the sample reveals that the average experience of the men is approximately 21 years, whereas the women only have about 7 years experience on average (see table below).
+trump <- contributors %>%
+  filter(cand_nm == "Trump, Donald J.") %>%
+  group_by(primary_city) %>%
+  summarize(contb_receipt_amt = sum(contb_receipt_amt)) %>%
+  slice_max(order_by = contb_receipt_amt, n = 10) %>%
+  mutate(city = fct_reorder(primary_city, contb_receipt_amt, max))
+#trump
+p2 <- ggplot(trump, aes(contb_receipt_amt, city)) +
+  geom_col(fill = "red") + 
+  labs(title = "Trump, Donald J.",
+   x = NULL,
+   y = NULL) + 
+  theme_bw() + 
+  scale_x_continuous(labels = scales::dollar_format())  +
+  theme(text = element_text(size = 9),element_line(size =1))
+#p2
 
-```{r, experience_stats_1}
-# Summary Statistics of salary by gender
-favstats (experience ~ gender, data=omega)
-
-library(infer)
-set.seed(1234)
-pub_private_null <- omega %>% 
-     specify(experience ~ gender) %>% 
-     hypothesize(null = "independence") %>% 
-     generate(reps = 1000, type = "permute") %>% 
-     calculate(stat = "diff in means", 
-                              order = c("female", "male"))
-
-observed_difference <- mean(omega$salary) - mean(omega$gender)
-
-pub_private_null %>% visualize()
-
-#p-value too low to obtain
-
-
+p1 + p2 + plot_annotation(
+  title = "Where did candidates raise most money?"
+)
 ```
 
+## Top 10 cities for the top 10 candidates
 
-> We can see that the P value is extremely close to 0 so we can say that there is a significant difference between the experience of male and female executives. This conclusion endangers the premise that salaries differ solely on gender, through this analysis we can see that experience also has a significant part to play. 
+```{r challenge_2_2}
+#CA_contributors_2016
+zipcodes <- vroom::vroom(here::here("data","zip_code_database.csv"))
+zipcodes <- mutate(zipcodes, zip = as.double(zip))
+contributors <- left_join(CA_contributors_2016, zipcodes, by = "zip")
+#contributors
 
-## Relationship Salary - Experience ?
+top_ten <- contributors %>%
+  group_by(cand_nm) %>%
+  summarise(total_price = sum(contb_receipt_amt)) %>%
+  slice_max(order_by = total_price, n=10)
+#top_ten
 
+library(tidytext)
 
-```{r, salary_exp_scatter_1}
-library(ggplot2)
-plot1 <- ggplot(data = omega, mapping = aes(x = experience, y = salary
-))+
-geom_point()+
-geom_smooth(method = "lm")+
-NULL 
-
-```
-
-## Check correlations between the data
-
-
-```{r, ggpairs_1}
-omega %>% 
-  select(gender, experience, salary) %>% #order variables they will appear in ggpairs()
-  ggpairs(aes(colour=gender, alpha = 0.3))+
-  theme_bw()
-```
-
-> From the scatter plot and the correlation coefficient we can see that there is a significant positive correlation (0.803) between the 2 variables. As experience increases, salary increases.
-
-
-# Challenge 1: Brexit plot
-
-```{r brexit}
-
-brexit_results <- read_csv("https://raw.githubusercontent.com/kostis-christodoulou/am01/master/data/brexit_results.csv")
-brexit_results
-
-brexit_results_long <- pivot_longer(brexit_results, 
-                                    col = c("con_2015", "lab_2015","ld_2015", "ukip_2015"), 
-                                    names_to = "party", 
-                                    values_to = "party_percentage") %>%
-  filter(party %in% c("con_2015", "lab_2015", "ld_2015", "ukip_2015", "leave_share"))
-brexit_results_long
-
-brexit_results_long <- pivot_longer(brexit_results, 
-                                    col = c("con_2015", "lab_2015","ld_2015", "ukip_2015"), 
-                                    names_to = "party", 
-                                    values_to = "party_percentage") %>%
-  summarize(Seat, party, party_percentage, leave_share)
-brexit_results_long
-
-party_colours = c("#0087DC", "#E4003B", "#FAA61A", "#FFD700")
-parties = c("Conservaltive", "Labour", "Lib Dems", "UKIP")
-
-g <- ggplot(brexit_results_long, aes(x = party_percentage, y = leave_share, colour = party)) +
-  geom_point(size = 0.3) +
-  geom_smooth(method = lm) +
-  scale_colour_manual(labels = parties, values = party_colours) +
+contributors %>%
+  filter(cand_nm %in% top_ten$cand_nm) %>%
+  group_by(cand_nm, primary_city) %>%
+  summarize(contb_receipt_amt = sum(contb_receipt_amt)) %>%
+  arrange(cand_nm, desc(contb_receipt_amt)) %>%
+  top_n(10, contb_receipt_amt) %>%
+  mutate(primary_city = reorder_within(primary_city, contb_receipt_amt, cand_nm)) %>%
+  ggplot(aes(contb_receipt_amt, primary_city)) +
+  geom_col() + 
+  facet_wrap(vars(factor(cand_nm)), scales = "free") +
   labs(
-    title = "How political affiliation translated to Brexit voting"
+    title = "Where did the top 10 candidates raise most money?",
+    x = NULL,
+    y = NULL
   ) + 
-  ylab("Leave % in the 2016 Brexit referendum") +
-  xlab("Party % in the UK 2015 general election") +
-  theme(legend.position = "bottom") +
-  theme(legend.title=element_blank())
-g
+  scale_y_reordered() + 
+  scale_x_continuous(labels = scales::dollar)
 ```
-
-> Looking at this graph, we can see that there is a moderate negative correlation between LibDem percentage and voting for Brexit.  On the other hand, what stands out, is a high correlation between the UKIP percentage and voting for Brexit. This is not very surprising given that UKIP (UK Independence Party) was at the forefront of leading the Brexit campaign. Moreover, we can also observe a slight positive correlation between conservative % and leave %.
-
-# Challenge 2:GDP components over time and among countries
-
-```{r read_GDP_data}
-
-UN_GDP_data  <-  read_excel(here::here("data", "Download-GDPconstant-USD-countries.xls"), # Excel filename
-                sheet="Download-GDPconstant-USD-countr", # Sheet name
-                skip=2) # Number of rows to skip
-
-```
-
-## Data Cleaning
-
--   make the dataframe into the long format
-
--   express all figures in billions
-
--   rename the indicators into something shorter
-
-```{r data_overview}
-head(UN_GDP_data)
-skimr::skim(UN_GDP_data)
-```
-
-```{r the_indicators}
-indicator_long <- sort(distinct(UN_GDP_data, IndicatorName)$IndicatorName)
-```
-
-```{r get_abbreviation}
-# create a dataframe with indicator~shorter name
-indicator_match <- data.frame(IndicatorName = sort(distinct(UN_GDP_data, IndicatorName)$IndicatorName), 
-                              abbrv = c(
-  "category_AB", "Changes in inventories", "category_F", "Exports", 
-  "Final expenditure", "Government expenditure", "Gross capital formation", "GDP", 
-  "Gross fixed capital formation", "Household expenditure", "Imports", "category_D", 
-  "category_CE", "category_JP", "TVA", "category_I", "category_GH")
-  )
-indicator_match
-```
-
-```{r cleaning_GDP_data}
-tidy_GDP_data <- 
-  pivot_longer(data = UN_GDP_data, col = 4:51, names_to = "year", values_to = "value") %>% # 
-  mutate(value = value / 1e9) %>%   # to billion
-  left_join(indicator_match, by = "IndicatorName")  # get the abbreviation of indicators
-
-glimpse(tidy_GDP_data)
-
-# the 3 countries for comparison
-country_list <- c("United States","India", "Germany")
-```
-
-## GDP components growth overview
-
-```{r gdp_comp_over_time}
-target_ind <- c(
-  "Gross fixed capital formation", 
-  "Exports", "Government expenditure", 
-  "Household expenditure", "Imports"
-  )
-
-tidy_GDP_data %>% 
-  # filter by target countries and indicators
-  filter((Country %in% country_list) & (abbrv %in% target_ind)) %>% 
-  mutate(year = as.integer(year)) %>% 
-  ggplot(aes(x = year, y = value, colour = abbrv, group = abbrv)) +
-  geom_line() +
-  scale_x_discrete(limits=c(1970, 1980, 1990, 2000, 2010)) + 
-  facet_wrap(~Country) + 
-  labs(title = "GDP components over time", 
-       subtitle = "In constant 2010 USD", 
-       y = "Billion US$", 
-       x = "") + 
-  scale_color_discrete(name="Components of GDP") + 
-  theme_bw()
-```
-
-## Calculated & Recorded GDP
-
-calculate GDP using the formula below:
-
-    GDP = Government expenditure + Gross fixed capital formation + Household expenditure + Net exports
-
-```{r get_components}
-tidy_GDP_data_x <- tidy_GDP_data %>% 
-  filter(abbrv %in% 
-           c("Exports", "Imports", 
-             "Government expenditure", 
-             "Gross capital formation", 
-             "Household expenditure", 
-             "GDP")) %>% 
-  # get GDP components, ratios / recorded_GDP, GDP_hat
-  summarize(Country, year, abbrv, value) %>% 
-  pivot_wider(names_from = abbrv, values_from = value) %>% 
-  mutate(`Net exports` = Exports - Imports, 
-         Gr = `Government expenditure` / GDP, 
-         Cr = `Household expenditure` / GDP, 
-         Ir = `Gross capital formation` / GDP, 
-         Xr = (Exports - Imports) / GDP, 
-         GDP_hat = 
-           `Government expenditure` + `Household expenditure` + 
-           `Gross capital formation` + (Exports - Imports)) %>% 
-  summarize(Country, year, 
-            `Government expenditure`, 
-            `Gross capital formation`, 
-            `Household expenditure`, `Net exports`, 
-            Gr, Cr, Ir, Xr, 
-            GDP, GDP_hat) %>% 
-  # convert to longer
-  pivot_longer(cols = 3:12, names_to = "components", values_to = "value")
-```
-
-> Differences between the calculated (or theoretical) GDP and the recorded one varies across countries.
-
-```{r mean_diff}
-tidy_GDP_data_x %>% 
-  pivot_wider(names_from = components, values_from = value) %>% 
-  mutate(diff_perc = (GDP_hat - GDP) / GDP) %>% 
-  group_by(Country) %>% 
-  summarize(mean_difference = mean(diff_perc)) %>% 
-  slice_max(mean_difference, n = 10)
-
-tidy_GDP_data_x %>% 
-  pivot_wider(names_from = components, values_from = value) %>% 
-  mutate(diff_perc = (GDP_hat - GDP) / GDP) %>% 
-  group_by(Country) %>% 
-  summarize(mean_difference = mean(diff_perc)) %>% 
-  slice_min(mean_difference, n = 10)
-```
-
-```{r func_exp_true_gdp}
-# function for visualizing gdp difference given country list
-get_gaps <- function(data,  countries) { 
-  data %>% 
-    filter(Country %in% countries) %>% 
-    pivot_wider(names_from = components, values_from = value) %>% 
-    mutate(diff_perc = (GDP_hat - GDP) / GDP) %>% 
-    mutate(year = as.integer(year)) %>% 
-    ggplot(aes(x = year, y = diff_perc)) +
-    geom_line() +
-    scale_x_discrete(limits=c(1970, 1980, 1990, 2000, 2010)) + 
-    scale_y_continuous(labels = scales::percent) + 
-    facet_wrap(~Country) + 
-    labs(title = "% difference between calculated & recorded GDP", 
-       y = "% difference", 
-       x = "") + 
-  theme_bw()
-}
-```
-
-> Taking three countries as an example, the difference also changes over time for individual country.
-
-```{r gdp_gaps_eg}
-get_gaps(tidy_GDP_data_x, c("United States","India", "Germany"))
-```
-
-## The GDP components trend
-
-```{r get_comp_gdp_func}
-# visualizing gdp components% changing with years, comparing countries
-get_comp_plot <- function(df, countries){
-  # filter by countries and indicators
-  data <- df %>% 
-    filter((Country %in% countries) & 
-             (components %in% c("Gr", "Cr", "Ir", "Xr"))
-           ) %>% 
-    mutate(year = as.integer(year))
-  data$components <- factor(data$components, 
-                            c("Gr", "Ir", "Cr", "Xr"))
-  # plotting
-  ggplot(data = data, aes(x = year, y = value, colour = components, group = components)) +
-    geom_line() +
-    scale_x_discrete(limits=c(1970, 1980, 1990, 2000, 2010)) + 
-    scale_y_continuous(labels = scales::percent) + 
-    facet_wrap(~Country, nrow = 1) + 
-    labs(title = "GDP and its breakdown at constant 2010 prices in US Dollar", 
-         caption = "Source: United Nations, https://unstats.un.org/unsd/snaama/Downloads", 
-         y = "proportion", 
-         x = "") + 
-    scale_color_discrete(
-      labels = c("Government expenditure", "Gross capital formation", "Household expenditure", "Net exports")) +
-    theme_bw() +
-    theme(legend.title = element_blank())
-}
-```
-
-### US, Indian, Germany
-
-```{r gdp_components_eg}
-get_comp_plot(tidy_GDP_data_x, c("United States","India", "Germany"))
-```
-
-> For all the three, household expenditure is a primary component of GDP.
-
-> Government expenditure in India has been far less than the other two countries. More specifically, the gross capital formation and the household expenditure exhibit opposite trends, while the government expenditure and the net exports are more stable.
-
-> As for the net exports, Germany shows a positive net export from the 21st century, while Indian and the US shows a trade deficit. Plus, the trade deficit of the US is expanding.
-
-### US, Indian, China
-
-```{r gdp_components_eg2}
-get_comp_plot(tidy_GDP_data_x, c("United States","India", "China"))
-```
-
-> Since the beginning of the 21st century, the net export in China has been above zero, partly due to its cheap labour, which boosted the manufacturing industry.
 
 # Deliverables
 
@@ -651,21 +696,23 @@ There is a lot of explanatory text, comments, etc. You do not need these, so del
 
 # Details
 
--   Who did you collaborate with:
+-   Who did you collaborate with: (alphabetical order)
 
     -   Amelia Przybyl, Athos Gyalui, Drishti Hoskote, Mingyu Dai, San Kashyap
 
--   Approximately how much time did you spend on this problem set:
-
-    -   about 8 hrs each person
+-   Approximately how much time did you spend on this problem set: 5-6 hours each group member
 
 -   What, if anything, gave you the most trouble:
 
-    -   Preparing the data for visual analysis and reproducing certain aesthetic features of graphs.
+    -   making the plots readable and *not* bad-looking
+    -   dealing with missing or duplicated data
+    -   understanding quesitons (part of them)
 
 **Please seek out help when you need it,** and remember the [15-minute rule](https://mam2022.netlify.app/syllabus/#the-15-minute-rule){target="_blank"}. You know enough R (and have enough examples of code from class and your readings) to be able to do this. If you get stuck, ask for help from others, post a question on Slack-- and remember that I am here to help too!
 
 > As a true test to yourself, do you understand the code you submitted and are you able to explain it to someone else?
+
+> Yes.
 
 # Rubric
 
@@ -674,3 +721,4 @@ Check minus (1/5): Displays minimal effort. Doesn't complete all components. Cod
 Check (3/5): Solid effort. Hits all the elements. No clear mistakes. Easy to follow (both the code and the output).
 
 Check plus (5/5): Finished all components of the assignment correctly and addressed both challenges. Code is well-documented (both self-documented and with additional comments as necessary). Used tidyverse, instead of base R. Graphs and tables are properly labelled. Analysis is clear and easy to follow, either because graphs are labeled clearly or you've written additional text to describe how you interpret the output.
+
