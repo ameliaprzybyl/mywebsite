@@ -12,7 +12,6 @@ image: me.jpg
 keywords: ""
 slug: aliquam
 title: About me
-knitr::include_graphics("/img/snorkelling.jpg",error=FALSE)
 ---
 
 ![me](/img/snorkelling.jpg)
