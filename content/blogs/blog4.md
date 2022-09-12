@@ -14,9 +14,9 @@ slug: aliquam
 title: About me
 ---
 
-### My name is **Amelia Przybyl**, I am originally from Poland. I have completed my undergraduate degree in Management at LSE. Before joining LBS, I have spent a year working in a FinTech focused VC.\
+### My name is **Amelia Przybyl**, I am originally from Poland. I have completed my undergraduate degree in Management at LSE. Before joining LBS, I have spent a year working in a FinTech focused VC.
 
-### My hobbies include:\
-#### 1. travel\
-#### 2. reading\
-#### 3. running\
+### My hobbies include:
+#### 1. travel
+#### 2. reading
+#### 3. running
