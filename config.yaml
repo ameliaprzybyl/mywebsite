@@ -86,7 +86,7 @@ params:
         title: Aliquam
         url: blogs/aliquam
       - image: pic02.jpg
-        subtitle: Feugiat Amet Tempus
+        subtitle: Feugiat Amet Tempus trying
         title: Tempus
         url: blogs/tempus
       - image: pic03.jpg
