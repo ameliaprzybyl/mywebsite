@@ -70,7 +70,7 @@ params:
       - name: Home
         url: '#'
       - name: Blogs
-       url: blogs
+        url: blogs
       - name: Generic Blog
         url: blogs/ipsum
       - name: Elements
@@ -81,7 +81,7 @@ params:
   tiles:
     enable: yes
     showcase:
-      - image: ![me](./themes/forty/static/img/mr.jpg)
+      - image: me.jpg
         subtitle: Ipsum Dolor Sit Amet hI THERE aras hi hi
         title: Aliquam
         url: blogs/aliquam
