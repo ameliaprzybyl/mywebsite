@@ -81,8 +81,8 @@ params:
   tiles:
     enable: yes
     showcase:
-      - image: /themes/forty/static/img/me.jpg
-        subtitle: Ipsum Dolor Sit Amet
+      - image: ![me](./themes/forty/static/img/mr.jpg)
+        subtitle: Ipsum Dolor Sit Amet hI THERE aras
         title: Aliquam
         url: blogs/aliquam
       - image: pic02.jpg
