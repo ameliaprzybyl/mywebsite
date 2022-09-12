@@ -10,15 +10,15 @@ description: Nullam et orci eu lorem consequat tincidunt vivamus et sagittis mag
 draft: false
 image: me.jpg
 keywords: ""
-slug: aliquam
+slug: about
 title: About me
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, out.width = "400px"}
 knitr::include_graphics("/img/blogs/snorkelling.jpg",error=FALSE)
 ```
 
-![me](/img/blogs/snorkelling.jpg) {width=50%}.
+![me](/img/blogs/snorkelling.jpg)
 
 ### My name is **Amelia Przybyl**, I am originally from Poland. I have completed my undergraduate degree in Management at LSE. Before joining LBS, I have spent a year working in a FinTech focused VC.
 
