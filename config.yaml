@@ -89,7 +89,7 @@ params:
         subtitle: Find out more about my trajectory so far
         title: CV
         url: blogs/tempus
-      - image: pic03.jpg
+      - image: airport.jpg
         subtitle: Lorem Etiam Nullam
         title: Magna
         url: blogs/magna
@@ -97,11 +97,11 @@ params:
         subtitle: Nisl Sed Aliquam
         title: Ipsum
         url: blogs/ipsum
-      - image: pic05.jpg
+      - image: colombia.jpg
         subtitle: Ipsum Dolor Sit Amet
         title: Consequat
         url: blogs/ipsum
-      - image: pic06.jpg
+      - image: capadoccia.jpg
         subtitle: Feugiat Amet Tempus
         title: Etiam
         url: blogs/ipsum
