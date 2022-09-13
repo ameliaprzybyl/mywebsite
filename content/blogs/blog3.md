@@ -1,5 +1,4 @@
 ---
-categories:
 - ""
 - ""
 #date: "2017-10-31T22:26:13-05:00"
@@ -38,3 +37,9 @@ output:
 Professional experience:
 
 -   title: Finch Capital content: Business Analyst time: Sept 2021 - Jul 2022
+
+| School                                           | Course                               | Time      |
+|--------------------------------|---------------------------|-------------|
+| London Business School                           | Masters in Analytics and Management  | 2022-2023 |
+| London School of Economics and Political Science | BSc Management (first class honors)  | 2017-2021 |
+| Wharton, University of Pennsylvania              | Exchange student                     | 2019-2020 |
