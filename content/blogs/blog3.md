@@ -14,10 +14,24 @@ slug: tempus
 title: CV
 ---
 
-Education:
-  - title: London Business School
-    content: Masters in Analytics and Management
-    time: Aug 2022 - Jun 2022
+```{css, echo=FALSE}
+
+<div class = "table wrapper">
+  <table>
+    <t> x </t>
+    </thead>
+  <tbody>
+    <t>
+      <td> London Business School </td>
+      <td> Masters in Analytics and Management </td>
+      <td> Aug 2022 - Jun 2022 </td>
+    </tbody>
+    <tfoot> <tfoot>
+    </table>
+  </div>
+    
+```
+
 
 Professional experience:
   - title: Finch Capital
