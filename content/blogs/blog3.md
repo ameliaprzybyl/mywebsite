@@ -24,9 +24,8 @@ title: Curriculum Vitae
 
 ## Professional Experience
 
-|                                      |           |
-|--------------------------------------|-----------|
 | **Finch Capital** - Business Analyst | 2021-2022 |
+|--------------------------------------|-----------|
 
 *VC focused on FinTech*
 
@@ -54,3 +53,19 @@ title: Curriculum Vitae
 in the 2018 Deal Advisory Spring Insight*
 
 -   Worked on a sell side payment business project and a buy side banking project
+
+## Extra-curricular information
+
+| LSE SU Polish Business Society | 2017-2019 |
+|--------------------------------|-----------|
+
+*Head of Research Team, Member of Leadership team of the LSE Polish Economic Forum*
+
+-   Lead the team to identify recommendations for improvement in Polish University education, based on comparison with UK educational system
+
+| LSE SU Fashion Society | 2018-2019 |
+|------------------------|-----------|
+
+*Vice President*
+
+-   Lead the team to organize an industry event to help students get an insight into a career in fashion, with representatives from e.g.: Burberry, Tiffany and Stella McCartney
