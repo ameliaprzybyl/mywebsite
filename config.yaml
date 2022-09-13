@@ -106,13 +106,8 @@ params:
         title: Etiam
         url: blogs/ipsum
   two:
-    buttonText: Get Started
+    buttonText: See my work
     enable: yes
-    subtitle: "Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero.
-      \n    Mauris aliquet magna magna sed nunc rhoncus pharetra. \n    Pellentesque
-      condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia
-      pellentesque lorem ipsum dolor. \n    Nullam et orci eu lorem consequat tincidunt.
-      Vivamus et sagittis libero.\n    Mauris aliquet magna magna sed nunc rhoncus
-      amet pharetra et feugiat tempus."
+    subtitle: "I recently started studying Analytics and Management at London Business School, where I am starting my journey with Data Science. Here is a sneak peak into what I have been working on so far"
     title: Welcome
     url: blogs
