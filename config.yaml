@@ -57,7 +57,7 @@ params:
       - icon: fa-linkedin
         label: LinkedIn
         url: https://www.linkedin.com/in/amelia-przybyl/
-  image: ''
+  image: 'chill.jpg'
   name: Amelia Przybyl
   navigation:
     button1:
