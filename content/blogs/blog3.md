@@ -1,4 +1,7 @@
 ---
+output:
+  html_document:
+    css: "style.css"
 categories:
 - ""
 - ""
@@ -12,6 +15,7 @@ draft: false
 keywords: ""
 slug: tempus
 title: CV
+
 ---
 
 ```{css, echo=FALSE}

@@ -11,6 +11,7 @@ params:
     #   A RESPONSIVE SITE TEMPLATE DESIGNED BY HTML5 UP
     #   AND RELEASED UNDER THE CREATIVE COMMONS.
     title: Hi, my name is Amelia
+    image: chill.jpg
   blog: {}
   contact:
     address:
@@ -57,7 +58,7 @@ params:
       - icon: fa-linkedin
         label: LinkedIn
         url: https://www.linkedin.com/in/amelia-przybyl/
-  image: 'chill.jpg'
+  image: ''
   name: Amelia Przybyl
   navigation:
     button1:

@@ -14,11 +14,12 @@ slug: aliquam
 title: About me
 ---
 
-```{r, out.width = "400px", echo=FALSE}
+```{r, out.width = "400px", echo=FALSE, include=FALSE}
+
 knitr::include_graphics("/img/blogs/snorkelling.jpg")
 ```
 
-![me](/img/blogs/snorkelling.jpg) {width=50%}.
+![me](/img/blogs/snorkelling.jpg){width=50%}.
 
 ### My name is **Amelia Przybyl**, I am originally from Poland. I have completed my undergraduate degree in Management at LSE. Before joining LBS, I have spent a year working in a FinTech focused VC.
 
