@@ -11,7 +11,7 @@ params:
     #   A RESPONSIVE SITE TEMPLATE DESIGNED BY HTML5 UP
     #   AND RELEASED UNDER THE CREATIVE COMMONS.
     title: Hi, my name is Amelia
-    background_image: 'banner.jpg'
+    background_img: banner.jpg
   blog: {}
   contact:
     address:
@@ -94,7 +94,7 @@ params:
         subtitle: Lorem Etiam Nullam
         title: Magna
         url: blogs/magna
-      - image: pic04.jpg
+      - image: washington.jpg
         subtitle: Nisl Sed Aliquam
         title: Ipsum
         url: blogs/ipsum
