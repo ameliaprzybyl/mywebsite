@@ -12,13 +12,15 @@ draft: false
 keywords: ""
 slug: tempus
 title: CV
-output: pdf_document
-header-includes:
- - /usepackage{pdfpackages}
 ---
 
-```{r setup, include=FALSE}
-knitr::include_graphics("static/img/blogs/cv.pdf",error=FALSE)
-```
+Education:
+  - title: London Business School
+    content: Masters in Analytics and Management
+    time: Aug 2022 - Jun 2022
 
-![CV](.static/img/blogs/cv.pdf){width=75%}
+Professional experience:
+  - title: Finch Capital
+    content: Business Analyst
+    time: Sept 2021 - Jul 2022
+    

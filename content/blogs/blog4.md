@@ -14,7 +14,7 @@ slug: aliquam
 title: About me
 ---
 
-```{r, out.width = "400px", include=FALSE}
+```{r, out.width = "400px", echo=FALSE}
 knitr::include_graphics("/img/blogs/snorkelling.jpg")
 ```
 
