@@ -46,8 +46,8 @@ title: Curriculum Vitae
 
 -   Assessed the attractiveness of numerous tech sectors
 
-| KPMG - Deal Advisory, Transaction Services Intern | 2018, 2019 |
-|---------------------------------------------------|------------|
+|  KPMG - Deal Advisory, Transaction Services Intern  | 2018, 2019 |
+|-----------------------------------------------------|------------|
 
 *Intern in the 2019 Deal Advisory Summer Program, Participant
 in the 2018 Deal Advisory Spring Insight*
