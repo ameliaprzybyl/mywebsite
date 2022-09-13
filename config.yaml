@@ -11,7 +11,7 @@ params:
     #   A RESPONSIVE SITE TEMPLATE DESIGNED BY HTML5 UP
     #   AND RELEASED UNDER THE CREATIVE COMMONS.
     title: Hi, my name is Amelia
-    image: chill.jpg
+    background_image: chill.jpg
   blog: {}
   contact:
     address:

@@ -1,7 +1,4 @@
 ---
-output:
-  html_document:
-    css: "style.css"
 categories:
 - ""
 - ""
@@ -15,7 +12,9 @@ draft: false
 keywords: ""
 slug: tempus
 title: CV
-
+output:
+  html_document:
+    css: "style.css"
 ---
 
 ```{css, echo=FALSE}
@@ -23,7 +22,7 @@ title: CV
 <div class = "table wrapper">
   <table>
     <t> x </t>
-    </thead>
+    <thead> Education </thead>
   <tbody>
     <t>
       <td> London Business School </td>
@@ -36,9 +35,6 @@ title: CV
     
 ```
 
-
 Professional experience:
-  - title: Finch Capital
-    content: Business Analyst
-    time: Sept 2021 - Jul 2022
-    
+
+-   title: Finch Capital content: Business Analyst time: Sept 2021 - Jul 2022
