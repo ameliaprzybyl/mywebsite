@@ -1,4 +1,5 @@
 ---
+categories:
 - ""
 - ""
 #date: "2017-10-31T22:26:13-05:00"
@@ -10,36 +11,27 @@ draft: false
 #image: pic08.jpg
 keywords: ""
 slug: tempus
-title: CV
-output:
-  html_document:
-    css: "style.css"
+title: Curriculum Vitae
 ---
 
-```{css, echo=FALSE}
+## Education
 
-<div class = "table wrapper">
-  <table>
-    <t> x </t>
-    <thead> Education </thead>
-  <tbody>
-    <t>
-      <td> London Business School </td>
-      <td> Masters in Analytics and Management </td>
-      <td> Aug 2022 - Jun 2022 </td>
-    </tbody>
-    <tfoot> <tfoot>
-    </table>
-  </div>
-    
-```
+| School                                           | Course                                | Time      |
+|-----------------------------|-------------------------|-------------------|
+| London Business School                           | Masters in Analytics and Management   | 2022-2023 |
+| London School of Economics and Political Science | BSc Management (first class honors)   | 2017-2021 |
+| Wharton, University of Pennsylvania              | Exchange student, focusing on finance | 2019-2020 |
 
-Professional experience:
+## Professional Experience
 
--   title: Finch Capital content: Business Analyst time: Sept 2021 - Jul 2022
+|                                       |           |
+|---------------------------------------|-----------|
+| **Finch Capital** - Business Analyst  | 2021-2022 |
 
-| School                                           | Course                               | Time      |
-|--------------------------------|---------------------------|-------------|
-| London Business School                           | Masters in Analytics and Management  | 2022-2023 |
-| London School of Economics and Political Science | BSc Management (first class honors)  | 2017-2021 |
-| Wharton, University of Pennsylvania              | Exchange student                     | 2019-2020 |
+-   Worked on deal sourcing and due diligence (incl. valuation projections)
+
+-   Acted as a Board Observer for ScalingFunds, a SaaS-based solution, created a competitive overview to support the product development strategy
+
+| Torch Partners - Summer Intern - Investment Banking | 2020       |
+|-----------------------------------------------------|------------|
+| KPMG - Deal Advisory, Transaction Services Intern   | 2018, 2019 |
