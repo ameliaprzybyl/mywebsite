@@ -86,7 +86,7 @@ params:
         subtitle: Short bio
         title: About me
         url: blogs/aliquam
-      - image: pic02.jpg
+      - image: money.jpg
         subtitle: Find out more about my trajectory so far
         title: CV
         url: blogs/tempus
