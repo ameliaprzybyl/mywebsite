@@ -55,11 +55,10 @@ library(countrycode)
 library(patchwork)
 library(gganimate)
 ```
+
 # Biden's Approval Margins
 
-As we saw in class, fivethirtyeight.com has detailed data on [all polls
-that track the president's
-approval](https://projects.fivethirtyeight.com/biden-approval-ratings)
+As we saw in class, fivethirtyeight.com has detailed data on [all polls that track the president's approval](https://projects.fivethirtyeight.com/biden-approval-ratings)
 
 ```{r, cache=TRUE}
 # Import approval polls data directly off fivethirtyeight website
@@ -70,21 +69,11 @@ glimpse(approval_polllist)
 # Use `lubridate` to fix dates, as they are given as characters.
 ```
 
-What I would like you to do is to calculate the average net approval
-rate (approve - disapprove) for each week since he got into office. I
-want you plot the net approval for each week in 2022, along with its 95%
-confidence interval. There are various dates given for each poll, please
-use `enddate`, i.e., the date the poll ended. Your plot should look
-something like this:
+What I would like you to do is to calculate the average net approval rate (approve - disapprove) for each week since he got into office. I want you plot the net approval for each week in 2022, along with its 95% confidence interval. There are various dates given for each poll, please use `enddate`, i.e., the date the poll ended. Your plot should look something like this:
 
 ## Create a plot
 
-What I would like you to do is to calculate the average net approval
-rate (approve - disapprove) for each week since he got into office. I
-want you plot the net approval for each week in 2022, along with its 95%
-confidence interval. There are various dates given for each poll, please
-use `enddate`, i.e., the date the poll ended. Your plot should look
-something like this:
+What I would like you to do is to calculate the average net approval rate (approve - disapprove) for each week since he got into office. I want you plot the net approval for each week in 2022, along with its 95% confidence interval. There are various dates given for each poll, please use `enddate`, i.e., the date the poll ended. Your plot should look something like this:
 
 ```{r trump_margins, out.width="100%"}
 knitr::include_graphics(here::here("images", "biden_approval_margin.png"), error = FALSE)
@@ -125,4 +114,5 @@ approval_polllist_cleaned %>%
     geom_ribbon(aes(ymin=approval_low,ymax=approval_high),alpha=0.2,fill="orange") 
 
 ```
-> As we can see from the above graph, Biden's net approval ratings seem to follow similar trends amongst all three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation. 
+
+> As we can see from the above graph, Biden's net approval ratings seem to follow similar trends amongst all three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation.
