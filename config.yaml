@@ -69,7 +69,7 @@ params:
     links:
       - name: Home
         url: '#'
-      - name: Blogs
+      - name: Data analysis portfolio
         url: blogs
       - name: Generic Blog
         url: blogs/ipsum
@@ -84,11 +84,11 @@ params:
       - image: me.jpg
         subtitle: Short bio
         title: About me
-        url: blogs/aliquam
+        url: blogs/about
       - image: money.jpg
         subtitle: Find out more about my career trajectory
         title: CV
-        url: blogs/tempus
+        url: blogs/cv
       - image: airport.jpg
         subtitle: Lorem Etiam Nullam
         title: Magna
@@ -114,5 +114,5 @@ params:
       pellentesque lorem ipsum dolor. \n    Nullam et orci eu lorem consequat tincidunt.
       Vivamus et sagittis libero.\n    Mauris aliquet magna magna sed nunc rhoncus
       amet pharetra et feugiat tempus."
-    title: Massa libero
+    title: Welcome
     url: blogs
