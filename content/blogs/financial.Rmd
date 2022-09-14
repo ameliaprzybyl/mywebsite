@@ -7,8 +7,8 @@ description: ""
 draft: false
 image: airport.jpg
 keywords: ""
-title: Advanced Data Analysis
 slug: financial
+title: Advanced Data Analysis
 ---
 
 ```{r, setup, echo=FALSE}
