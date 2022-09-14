@@ -102,9 +102,9 @@ params:
         title: Youth Risk Behavior Surveillance
         url: blogs/ipsum
       - image: capadoccia.jpg
-        subtitle: Feugiat Amet Tempus
-        title: Etiam
-        url: blogs/ipsum
+        subtitle: Project tbd
+        title: Finalgroup project
+        url: blogs/final
   two:
     buttonText: See my work
     enable: yes
