@@ -10,7 +10,7 @@ description: Nullam et orci eu lorem consequat tincidunt vivamus et sagittis mag
 draft: false
 image: me.jpg
 keywords: ""
-slug: aliquam
+slug: about
 title: About me
 ---
 
