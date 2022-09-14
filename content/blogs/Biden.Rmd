@@ -1,0 +1,121 @@
+---
+title: "Session 4: Homework 2"
+author: "Group 13:  "
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    highlight: zenburn
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    code_folding: show
+editor_options: 
+  markdown: 
+    wrap: 72
+slug: magna
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+```{r load-libraries, include=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(httr)
+library(readxl)
+library(vroom)
+library(wbstats)
+library(countrycode)
+library(patchwork)
+library(gganimate)
+```
+# Biden's Approval Margins
+
+As we saw in class, fivethirtyeight.com has detailed data on [all polls
+that track the president's
+approval](https://projects.fivethirtyeight.com/biden-approval-ratings)
+
+```{r, cache=TRUE}
+# Import approval polls data directly off fivethirtyeight website
+approval_polllist <- read_csv('https://projects.fivethirtyeight.com/biden-approval-data/approval_polllist.csv') 
+
+glimpse(approval_polllist)
+
+# Use `lubridate` to fix dates, as they are given as characters.
+```
+
+What I would like you to do is to calculate the average net approval
+rate (approve - disapprove) for each week since he got into office. I
+want you plot the net approval for each week in 2022, along with its 95%
+confidence interval. There are various dates given for each poll, please
+use `enddate`, i.e., the date the poll ended. Your plot should look
+something like this:
+
+## Create a plot
+
+What I would like you to do is to calculate the average net approval
+rate (approve - disapprove) for each week since he got into office. I
+want you plot the net approval for each week in 2022, along with its 95%
+confidence interval. There are various dates given for each poll, please
+use `enddate`, i.e., the date the poll ended. Your plot should look
+something like this:
+
+```{r trump_margins, out.width="100%"}
+knitr::include_graphics(here::here("images", "biden_approval_margin.png"), error = FALSE)
+```
+
+```{r approval_rate, out.width="100%"}
+
+approval_polllist_cleaned <- approval_polllist %>%
+#create net approval rate (approve - disapprove)
+  mutate(approval_rate = approve - disapprove) %>% 
+#translate date to weeks
+  mutate(date = as.Date(enddate, tryFormats = c("%m/%d/%Y")), 
+         weeks = week(date)) %>%
+  filter(year(date) == 2022) %>% 
+#group
+  group_by(weeks, subgroup) %>%
+#create confidence intervals 
+  summarise(mean_approval = mean(approval_rate, na.rm=TRUE),
+            std_dev_approval = sd(approval_rate, na.rm=TRUE),
+            sample_size = n(),
+            t_critical = qt(0.975, sample_size-1),
+            approval_high = mean_approval + t_critical * std_dev_approval / sqrt(sample_size),
+            approval_low = mean_approval - t_critical * std_dev_approval / sqrt(sample_size)
+            )
+
+#create the graph
+approval_polllist_cleaned %>%
+  ggplot(aes(x = weeks, y = mean_approval, color = factor(subgroup))) +
+    geom_line() +
+    facet_wrap(vars(subgroup), ncol=1, strip.position = "right") +
+    theme(legend.position="none",
+          axis.title.y = element_blank()) +
+    labs(
+    title = "Biden's Net Approval Ratings in 2022",
+    subtitle = "Weekly Data, Approve - Disapprove, %",
+    x = "Week in 2022",
+    caption = "Source: https://projects.fivethirtyeight.com/biden-approval-rating/") +
+    geom_ribbon(aes(ymin=approval_low,ymax=approval_high),alpha=0.2,fill="orange") 
+
+```
+> As we can see from the above graph, Biden's net approval ratings seem to follow similar trends amongst all three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation. 

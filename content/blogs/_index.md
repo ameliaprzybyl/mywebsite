@@ -1,9 +1,9 @@
 ---
 date: "`r Sys.Date()`"
 draft: false
-image: chill.jpg
+image: 
 slug: blogs
-title: Lifestyle
+title: Portfolio
 ---
 
-My blogs about technology and lifestyle.
+Some examples of my past projects
