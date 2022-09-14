@@ -1,20 +1,16 @@
 ---
-title: "Session 4: Homework 2"
-author: "Group 13:  "
+categories:
+- ""
+- ""
 date: "`r Sys.Date()`"
-output:
-  html_document:
-    theme: flatly
-    highlight: zenburn
-    number_sections: yes
-    toc: yes
-    toc_float: yes
-    code_folding: show
-editor_options: 
-  markdown: 
-    wrap: 72
+description: ""
+draft: false
+image: pic10.jpg
+keywords: ""
 slug: magna
+title: Biden title new
 ---
+
 
 ```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(
@@ -32,7 +28,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r load-libraries, include=FALSE}
+```{r load-libraries, echo=FALSE}
 library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
 library(mosaic)
 library(ggthemes)
@@ -46,7 +42,6 @@ library(vroom)
 library(wbstats)
 library(countrycode)
 library(patchwork)
-library(gganimate)
 ```
 # Biden's Approval Margins
 
@@ -73,15 +68,10 @@ something like this:
 ## Create a plot
 
 What I would like you to do is to calculate the average net approval
-rate (approve - disapprove) for each week since he got into office. I
-want you plot the net approval for each week in 2022, along with its 95%
+rate (approve - disapprove) for each week since he got into office. Plot the net approval for each week in 2022, along with its 95%
 confidence interval. There are various dates given for each poll, please
 use `enddate`, i.e., the date the poll ended. Your plot should look
 something like this:
-
-```{r trump_margins, out.width="100%"}
-knitr::include_graphics(here::here("images", "biden_approval_margin.png"), error = FALSE)
-```
 
 ```{r approval_rate, out.width="100%"}
 
