@@ -10,7 +10,7 @@ categories:
 draft: false
 #image: pic08.jpg
 keywords: ""
-slug: tempus
+slug: cv
 title: Curriculum Vitae
 ---
 

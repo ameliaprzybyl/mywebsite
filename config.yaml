@@ -108,6 +108,6 @@ params:
   two:
     buttonText: See my work
     enable: yes
-    subtitle: "I recently started studying Analytics and Management at London Business School, where I am starting my journey with Data Science. Here is a sneak peak into what I have been working on so far"
+    subtitle: "I recently started studying Analytics and Management at London Business School, where I am starting my journey with Data Science. Here is a sneak peak into what I have been working on so far."
     title: Welcome
     url: blogs

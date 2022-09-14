@@ -20,7 +20,7 @@ title: About me
 
 ### My hobbies include:
 
-#### 1. travel
+#### 1. travelling
 
 #### 2. reading
 
