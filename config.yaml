@@ -100,10 +100,10 @@ params:
       - image: colombia.jpg
         subtitle: Studying if physical activity influences weight
         title: Youth Risk Behavior Surveillance
-        url: blogs/ipsum
+        url: blogs/youth
       - image: capadoccia.jpg
         subtitle: Project tbd
-        title: Finalgroup project
+        title: Final group project
         url: blogs/final
   two:
     buttonText: See my work
