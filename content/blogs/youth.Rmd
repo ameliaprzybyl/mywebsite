@@ -1,0 +1,229 @@
+---
+categories:
+- ""
+- ""
+date: "`r Sys.Date()`"
+description: ""
+draft: false
+image: colombia.jpg
+keywords: ""
+slug: youth
+title: Youth Risk Behavior Surveillance
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+```{r load-libraries, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(GGally)
+library(readxl)
+library(here)
+library(skimr)
+library(janitor)
+library(broom)
+library(tidyquant)
+library(infer)
+library(openintro)
+```
+
+# Youth Risk Behavior Surveillance
+
+## Load the data
+
+```{r}
+data(yrbss)
+glimpse(yrbss)
+```
+
+Check missing values, summary statistics of numerical variables, and a very rough histogram.
+
+```{r, feeling the data}
+skimr::skim(yrbss)
+```
+
+## Exploratory Data Analysis
+
+### Distribution
+
+
+```{r, eda_on_weight}
+weight <- skimr::skim(yrbss) %>%
+  filter(skim_variable=="weight")
+
+ggplot(yrbss, aes(x=weight, na.rm=TRUE)) +
+   geom_density() 
+
+```
+
+> As we can see from the data, there are 1004 missing observations, the distribution is right skewed with its mean at 68kg and standard deviation at 17.
+
+```{r, mutate_and_count}
+yrbss_clean <- yrbss %>% 
+  drop_na(weight) %>%
+  drop_na(physically_active_7d) %>%
+  mutate(physical_3plus = ifelse(physically_active_7d > 2, "yes", "no"))
+
+#count method
+yrbss_cm <- yrbss_clean %>% 
+  count(physical_3plus)
+##calculating percentage active and inactive with count method
+percentage_active_cm <- yrbss_cm[2,2] / (yrbss_cm[1,2]+ yrbss_cm[2,2])
+percentage_inactive_cm <- 1 - percentage_active_cm
+
+#group by and summarize method (gbsm)
+yrbss_gbsm <- yrbss_clean %>% 
+  group_by(physical_3plus) %>%
+  summarize(n = n())
+##calculating percentage active and inactive with gbsm method
+percentage_active_gbsm <- yrbss_gbsm[2,2] / (yrbss_gbsm[1,2]+ yrbss_gbsm[2,2])
+percentage_inactive_gbsm <- 1 - percentage_active_gbsm
+```
+
+>Above, we calculated the number of those that are not active for more than three days - 4022 - which constitutes 32.5% of the observations. The number is the same when using both the count method as well as the group by and summarise way.
+
+### CI: inactive high schoolers
+
+the Confidence Interval for the population proportion of high schoolers that are NOT active 3 or more days per week
+
+```{r, confidence_interval}
+
+sum = yrbss_gbsm[1,2] + yrbss_gbsm[2,2]
+sd = sqrt((sum*percentage_inactive_cm)*(percentage_active_gbsm))
+z = 1.96
+
+#calculating confidence intervals
+CI_low = percentage_inactive_cm-z*sd/sqrt(sum)
+CI_high = percentage_inactive_cm+z*sd/sqrt(sum)
+
+print(CI_low)
+print(CI_high)
+```
+
+>The 95% confidence interval is between -0.593 and 1.24. This confidence interval fully covers the range from 0 to 1, which are the only results that we could observe in real life. This shows us that the data does not give us a reliable method of estimation for the population proportion of high schoolers that are not active for 3 or more days a week.
+
+### Boxplot: physical_3plus & weight
+
+```{r, boxplot}
+yrbss_clean %>%
+  group_by(physical_3plus, weight) %>%
+  ggplot(aes(x = physical_3plus, y = weight, fill=physical_3plus)) +
+  geom_boxplot() +
+    labs(
+    title = "Boxplot of people active for more than 3 days vs weight",
+    x = "Are they active more than 3 times a week?",
+    y = "Weight")
+```
+
+> Based on this graph we can infer that there does not seem to be a relationship between weight and activity, which seems counterintuitive. This could point us to the fact that there is in fact another variable that influences your weight instead of physical activity, like for example consumption habits or genetics.
+
+## Confidence Interval
+
+```{r, ci_using_formulas}
+#Confidence interval - highly active
+CI_highly_active <- yrbss_clean %>%
+  filter(physical_3plus == "yes") %>%
+  summarize(mean_weight = mean(weight, na.rm=TRUE),
+            std_dev_weight = sd(weight, na.rm=TRUE),
+            sample_size = n(),
+            z = 1.96,
+            CI_high = mean_weight + z * std_dev_weight / sqrt(sample_size),
+            CI_low = mean_weight - z * std_dev_weight / sqrt(sample_size)
+            )
+
+print(CI_highly_active)
+
+#Confidence interval - not active
+CI_not_active <- yrbss_clean %>%
+  filter(physical_3plus == "no") %>%
+  summarize(mean_weight = mean(weight, na.rm=TRUE),
+            std_dev_weight = sd(weight, na.rm=TRUE),
+            sample_size = n(),
+            z = 1.96,
+            CI_high = mean_weight + z * std_dev_weight / sqrt(sample_size),
+            CI_low = mean_weight - z * std_dev_weight / sqrt(sample_size)
+            )
+
+print(CI_not_active)
+
+```
+
+
+## Hypothesis test with formula
+
+
+```{r, t_test_using_R}
+
+t.test(weight ~ physical_3plus, data = yrbss_clean)
+
+```
+
+> The null hypothesis is that the true difference in means between group yes and no equals to zero, the alternative hypothesis is that it does not equal zero. As the p value is smaller than 0.05, we can reject the null hypothesis.
+
+## Hypothesis test with `infer`
+
+Initialize the test: 
+
+```{r, calc_obs_difference}
+obs_diff <- yrbss_clean %>%
+  specify(weight ~ physical_3plus) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+
+```
+
+Simulate the test on the null distribution: 
+
+```{r, hypothesis_testing_using_infer_package}
+
+null_dist <- yrbss_clean %>%
+  # specify variables
+  specify(weight ~ physical_3plus) %>%
+  
+  # assume independence, i.e, there is no difference
+  hypothesize(null = "independence") %>%
+  
+  # generate 1000 reps, of type "permute"
+  generate(reps = 1000, type = "permute") %>%
+  
+  # calculate statistic of difference, namely "diff in means"
+  calculate(stat = "diff in means", order = c("yes", "no"))
+
+```
+
+Visualize the null distribution: 
+
+```{r}
+ggplot(data = null_dist, aes(x = stat)) +
+  geom_histogram()
+
+```
+
+The p-value for the hypothesis test: 
+
+```{r}
+
+null_dist %>% visualize() +
+  shade_p_value(obs_stat = obs_diff, direction = "two-sided")
+
+null_dist %>%
+  get_p_value(obs_stat = obs_diff, direction = "two_sided")
+
+```
+
+>As the p value is on the right side of the observations, we can reject the null hypothesis.
+
