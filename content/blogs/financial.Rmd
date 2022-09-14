@@ -1,0 +1,158 @@
+---
+- ""
+- ""
+date: "`r Sys.Date()`"
+description: ""
+draft: false
+image: airport.jpg
+keywords: ""
+title: Advanced Data Analysis
+slug: financial
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(vroom)
+library(tidyquant)
+```
+
+# Returns of financial stocks
+
+> useful material [finance data sources](https://mam2023.netlify.app/reference/finance_data/).
+
+```{r load_nyse_data, message=FALSE, warning=FALSE}
+nyse <- readr::read_csv(here::here("data","nyse.csv"))
+```
+
+## The number of companies per sector
+
+```{r companies_per_sector}
+#Understanding the data
+head(nyse)
+
+#Creating a table that shows the number of companies per sector, in descending order
+descending_sector <- nyse %>%
+  dplyr::group_by(sector) %>%
+  count(sector) %>%
+  arrange(desc(sector))
+descending_sector
+
+#Creating a bar plot with the number of companies per sector, in descending order
+
+ggplot(descending_sector, aes(x=reorder(sector, -n), y = n)) + 
+  geom_bar(stat = "identity") +
+  labs(title = "Number of companies by sector",
+    x = "Sector",
+    y = "Number of companies")
+```
+
+Next, let's choose some stocks and their ticker symbols and download some data. You **MUST** choose 6 different stocks from the ones listed below; You should, however, add `SPY` which is the SP500 ETF (Exchange Traded Fund).
+
+## Picking stocks
+
+Stocks we chose: `AAPL`, `JPM`, `ANF`, `TSLA`, `XOM`, `SPY`
+
+```{r get_price_data, message=FALSE, warning=FALSE, cache=FALSE}
+
+myStocks <- c("AAPL","JPM","ANF","TSLA","XOM","SPY" ) %>%
+  tq_get(get  = "stock.prices",
+         from = "2011-01-01",
+         to   = "2022-08-31") %>%
+  group_by(symbol) 
+
+glimpse(myStocks) # examine the structure of the resulting data frame
+```
+
+## Daily and monthly returns.
+
+```{r calculate_returns, message=FALSE, warning=FALSE, cache=TRUE}
+#calculate daily returns
+myStocks_returns_daily <- myStocks %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "daily", 
+               type       = "log",
+               col_rename = "daily_returns",
+               cols = c(nested.col))  
+
+#calculate monthly  returns
+myStocks_returns_monthly <- myStocks %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "monthly", 
+               type       = "arithmetic",
+               col_rename = "monthly_returns",
+               cols = c(nested.col)) 
+
+#calculate yearly returns
+myStocks_returns_annual <- myStocks %>%
+  group_by(symbol) %>%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = "yearly", 
+               type       = "arithmetic",
+               col_rename = "yearly_returns",
+               cols = c(nested.col))
+```
+
+Summarizing monthly returns for each of the stocks and `SPY`; min, max, median, mean, SD.
+
+```{r summarise_monthly_returns}
+monthly_returns_summary <- myStocks_returns_monthly %>% 
+  group_by(symbol) %>% 
+  summarise(mean_monthly_return = mean (monthly_returns, na.rm=TRUE),
+      median_monthly_return = median (monthly_returns, na.rm=TRUE),
+      sd_monthly_return = sd (monthly_returns, na.rm=TRUE),
+      min_monthly_return = min (monthly_returns, na.rm=TRUE),
+      max_monthly_return = max (monthly_returns, na.rm=TRUE))
+monthly_returns_summary
+```
+
+Density plot for each of the stocks:
+
+```{r density_monthly_returns}
+plot1 <- myStocks_returns_monthly %>%
+  group_by(symbol) %>% 
+  ggplot(aes(x = monthly_returns)) +
+   facet_wrap(~symbol, scales = "free")+
+   geom_density()
+plot1
+```
+
+> We can see that most plots, apart from Apple and Tesla follow a normal distribution. We can also determine that TSLA is the stock with the highest risk. Not only is the distribution heavily skewed right, but the monthly retuns on the most likely return are lower than zero. XOM on the other hand is the least risky stock, as it's density plot is heavily concentrated amongst one value, 0. Therefore we can infer that it's variability is fairly low.
+
+## Risk & Return
+
+```{r risk_return_plot}
+plot2 <- ggplot(data = monthly_returns_summary, mapping = aes(x = sd_monthly_return, y = mean_monthly_return)) +
+   geom_point() +
+   ggrepel::geom_text_repel(aes(label=symbol))+
+   labs(title = "Risk/return by stock",
+        x = "Risk",
+        y = "Return")
+plot2
+```
+
+> As we can see based on this plot, higher return is typically correlated with higher risk. However, some stocks, like for example ANF, have higher risk without there being a significant increase in the returns. As an investor, you can use this graph to determine not to invest in a stock like ANF.

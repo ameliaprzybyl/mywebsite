@@ -90,9 +90,9 @@ params:
         title: CV
         url: blogs/cv
       - image: airport.jpg
-        subtitle: Lorem Etiam Nullam
-        title: Magna
-        url: blogs/magna
+        subtitle: Risk return analysis
+        title: Financial Analysis
+        url: blogs/financial
       - image: washington.jpg
         subtitle: Net approval ratings in 2022
         title: Biden's Approval
