@@ -5,10 +5,10 @@ categories:
 date: "`r Sys.Date()`"
 description: ""
 draft: false
-image: pic10.jpg
+image: washington.jpg
 keywords: ""
-slug: magna
-title: Biden title new
+slug: biden
+title: Biden's approval
 ---
 
 
@@ -45,9 +45,9 @@ library(patchwork)
 ```
 # Biden's Approval Margins
 
-As we saw in class, fivethirtyeight.com has detailed data on [all polls
+fivethirtyeight.com has detailed data on [all polls
 that track the president's
-approval](https://projects.fivethirtyeight.com/biden-approval-ratings)
+approval](https://projects.fivethirtyeight.com/biden-approval-ratings) 
 
 ```{r, cache=TRUE}
 # Import approval polls data directly off fivethirtyeight website
@@ -67,24 +67,23 @@ something like this:
 
 ## Create a plot
 
-What I would like you to do is to calculate the average net approval
+What I would like to do is to calculate the average net approval
 rate (approve - disapprove) for each week since he got into office. Plot the net approval for each week in 2022, along with its 95%
-confidence interval. There are various dates given for each poll, please
-use `enddate`, i.e., the date the poll ended. Your plot should look
-something like this:
+confidence interval.
 
 ```{r approval_rate, out.width="100%"}
 
+#cleaning the data
 approval_polllist_cleaned <- approval_polllist %>%
-#create net approval rate (approve - disapprove)
+#creating net approval rate (approve - disapprove)
   mutate(approval_rate = approve - disapprove) %>% 
-#translate date to weeks
+#translating date to weeks
   mutate(date = as.Date(enddate, tryFormats = c("%m/%d/%Y")), 
          weeks = week(date)) %>%
   filter(year(date) == 2022) %>% 
-#group
+#groupping
   group_by(weeks, subgroup) %>%
-#create confidence intervals 
+#creating confidence intervals 
   summarise(mean_approval = mean(approval_rate, na.rm=TRUE),
             std_dev_approval = sd(approval_rate, na.rm=TRUE),
             sample_size = n(),
@@ -93,7 +92,7 @@ approval_polllist_cleaned <- approval_polllist %>%
             approval_low = mean_approval - t_critical * std_dev_approval / sqrt(sample_size)
             )
 
-#create the graph
+#creating the graph
 approval_polllist_cleaned %>%
   ggplot(aes(x = weeks, y = mean_approval, color = factor(subgroup))) +
     geom_line() +
@@ -108,4 +107,6 @@ approval_polllist_cleaned %>%
     geom_ribbon(aes(ymin=approval_low,ymax=approval_high),alpha=0.2,fill="orange") 
 
 ```
-> As we can see from the above graph, Biden's net approval ratings seem to follow similar trends amongst all three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation. 
+
+> As we can see from the above graph, Biden's net approval ratings seem to follow similar trends amongst all 
+three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation. 

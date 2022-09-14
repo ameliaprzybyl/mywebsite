@@ -5,17 +5,17 @@ categories:
 date: "2022-09-14"
 description: ""
 draft: false
-image: pic10.jpg
+image: washington.jpg
 keywords: ""
-slug: magna
-title: Biden title new
+slug: biden
+title: Biden's approval
 ---
 
 
 
 <div id="bidens-approval-margins" class="section level1">
 <h1>Biden’s Approval Margins</h1>
-<p>As we saw in class, fivethirtyeight.com has detailed data on <a href="https://projects.fivethirtyeight.com/biden-approval-ratings">all polls
+<p>fivethirtyeight.com has detailed data on <a href="https://projects.fivethirtyeight.com/biden-approval-ratings">all polls
 that track the president’s
 approval</a></p>
 <pre class="r"><code># Import approval polls data directly off fivethirtyeight website
@@ -55,11 +55,9 @@ use <code>enddate</code>, i.e., the date the poll ended. Your plot should look
 something like this:</p>
 <div id="create-a-plot" class="section level2">
 <h2>Create a plot</h2>
-<p>What I would like you to do is to calculate the average net approval
+<p>What I would like to do is to calculate the average net approval
 rate (approve - disapprove) for each week since he got into office. Plot the net approval for each week in 2022, along with its 95%
-confidence interval. There are various dates given for each poll, please
-use <code>enddate</code>, i.e., the date the poll ended. Your plot should look
-something like this:</p>
+confidence interval.</p>
 <pre class="r"><code>approval_polllist_cleaned &lt;- approval_polllist %&gt;%
 #create net approval rate (approve - disapprove)
   mutate(approval_rate = approve - disapprove) %&gt;% 
@@ -91,7 +89,10 @@ approval_polllist_cleaned %&gt;%
     x = &quot;Week in 2022&quot;,
     caption = &quot;Source: https://projects.fivethirtyeight.com/biden-approval-rating/&quot;) +
     geom_ribbon(aes(ymin=approval_low,ymax=approval_high),alpha=0.2,fill=&quot;orange&quot;) </code></pre>
-<p><img src="/blogs/Biden_files/figure-html/approval_rate-1.png" width="100%" style="display: block; margin: auto;" />
-&gt; As we can see from the above graph, Biden’s net approval ratings seem to follow similar trends amongst all three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation.</p>
+<p><img src="/blogs/Biden_files/figure-html/approval_rate-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>As we can see from the above graph, Biden’s net approval ratings seem to follow similar trends amongst all
+three groups (Voters, Adults, All Polls). As we can observe, there is a huge dip after week 22, which reverts back to normal towards the end of the year. This can reflect the public attitude towards tight economic conditions, demonstrated for example by the surge in gas prices and inflation.</p>
+</blockquote>
 </div>
 </div>
