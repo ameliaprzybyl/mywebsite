@@ -1,0 +1,165 @@
+---
+categories:
+- ""
+- ""
+date: "2022-09-16"
+description: ""
+draft: false
+image: airport.jpg
+keywords: ""
+slug: financial
+title: Advanced Data Analysis
+---
+
+
+
+<div id="returns-of-financial-stocks" class="section level1">
+<h1>Returns of financial stocks</h1>
+<blockquote>
+<p>useful material <a href="https://mam2023.netlify.app/reference/finance_data/">finance data sources</a>.</p>
+</blockquote>
+<pre class="r"><code>nyse &lt;- readr::read_csv(here::here(&quot;data&quot;,&quot;nyse.csv&quot;))</code></pre>
+<div id="the-number-of-companies-per-sector" class="section level2">
+<h2>The number of companies per sector</h2>
+<pre class="r"><code>#Understanding the data
+head(nyse)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+##   symbol name                   ipo_year sector            industry      summa…¹
+##   &lt;chr&gt;  &lt;chr&gt;                  &lt;chr&gt;    &lt;chr&gt;             &lt;chr&gt;         &lt;chr&gt;  
+## 1 MMM    3M Company             n/a      Health Care       Medical/Dent… https:…
+## 2 ABB    ABB Ltd                n/a      Consumer Durables Electrical P… https:…
+## 3 ABT    Abbott Laboratories    n/a      Health Care       Major Pharma… https:…
+## 4 ABBV   AbbVie Inc.            2012     Health Care       Major Pharma… https:…
+## 5 ACN    Accenture plc          2001     Miscellaneous     Business Ser… https:…
+## 6 AAP    Advance Auto Parts Inc n/a      Consumer Services Other Specia… https:…
+## # … with abbreviated variable name ¹​summary_quote</code></pre>
+<pre class="r"><code>#Creating a table that shows the number of companies per sector, in descending order
+descending_sector &lt;- nyse %&gt;%
+  dplyr::group_by(sector) %&gt;%
+  count(sector) %&gt;%
+  arrange(desc(sector))
+descending_sector</code></pre>
+<pre><code>## # A tibble: 12 × 2
+## # Groups:   sector [12]
+##    sector                    n
+##    &lt;chr&gt;                 &lt;int&gt;
+##  1 Transportation           10
+##  2 Technology               40
+##  3 Public Utilities         60
+##  4 Miscellaneous            12
+##  5 Health Care              45
+##  6 Finance                  97
+##  7 Energy                   42
+##  8 Consumer Services        79
+##  9 Consumer Non-Durables    31
+## 10 Consumer Durables         8
+## 11 Capital Goods            45
+## 12 Basic Industries         39</code></pre>
+<pre class="r"><code>#Creating a bar plot with the number of companies per sector, in descending order
+
+ggplot(descending_sector, aes(x=reorder(sector, -n), y = n)) + 
+  geom_bar(stat = &quot;identity&quot;) +
+  labs(title = &quot;Number of companies by sector&quot;,
+    x = &quot;Sector&quot;,
+    y = &quot;Number of companies&quot;)</code></pre>
+<p><img src="/blogs/financial_files/figure-html/companies_per_sector-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Next, let’s choose some stocks and their ticker symbols and download some data. You <strong>MUST</strong> choose 6 different stocks from the ones listed below; You should, however, add <code>SPY</code> which is the SP500 ETF (Exchange Traded Fund).</p>
+</div>
+<div id="picking-stocks" class="section level2">
+<h2>Picking stocks</h2>
+<p>Stocks we chose: <code>AAPL</code>, <code>JPM</code>, <code>ANF</code>, <code>TSLA</code>, <code>XOM</code>, <code>SPY</code></p>
+<pre class="r"><code>myStocks &lt;- c(&quot;AAPL&quot;,&quot;JPM&quot;,&quot;ANF&quot;,&quot;TSLA&quot;,&quot;XOM&quot;,&quot;SPY&quot; ) %&gt;%
+  tq_get(get  = &quot;stock.prices&quot;,
+         from = &quot;2011-01-01&quot;,
+         to   = &quot;2022-08-31&quot;) %&gt;%
+  group_by(symbol) 
+
+glimpse(myStocks) # examine the structure of the resulting data frame</code></pre>
+<pre><code>## Rows: 17,610
+## Columns: 8
+## Groups: symbol [6]
+## $ symbol   &lt;chr&gt; &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL&quot;, &quot;AAPL…
+## $ date     &lt;date&gt; 2011-01-03, 2011-01-04, 2011-01-05, 2011-01-06, 2011-01-07, …
+## $ open     &lt;dbl&gt; 11.6, 11.9, 11.8, 12.0, 11.9, 12.1, 12.3, 12.3, 12.3, 12.4, 1…
+## $ high     &lt;dbl&gt; 11.8, 11.9, 11.9, 12.0, 12.0, 12.3, 12.3, 12.3, 12.4, 12.4, 1…
+## $ low      &lt;dbl&gt; 11.6, 11.7, 11.8, 11.9, 11.9, 12.0, 12.1, 12.2, 12.3, 12.3, 1…
+## $ close    &lt;dbl&gt; 11.8, 11.8, 11.9, 11.9, 12.0, 12.2, 12.2, 12.3, 12.3, 12.4, 1…
+## $ volume   &lt;dbl&gt; 4.45e+08, 3.09e+08, 2.56e+08, 3.00e+08, 3.12e+08, 4.49e+08, 4…
+## $ adjusted &lt;dbl&gt; 10.05, 10.10, 10.18, 10.18, 10.25, 10.44, 10.42, 10.50, 10.54…</code></pre>
+</div>
+<div id="daily-and-monthly-returns." class="section level2">
+<h2>Daily and monthly returns.</h2>
+<pre class="r"><code>#calculate daily returns
+myStocks_returns_daily &lt;- myStocks %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;daily&quot;, 
+               type       = &quot;log&quot;,
+               col_rename = &quot;daily_returns&quot;,
+               cols = c(nested.col))  
+
+#calculate monthly  returns
+myStocks_returns_monthly &lt;- myStocks %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;monthly&quot;, 
+               type       = &quot;arithmetic&quot;,
+               col_rename = &quot;monthly_returns&quot;,
+               cols = c(nested.col)) 
+
+#calculate yearly returns
+myStocks_returns_annual &lt;- myStocks %&gt;%
+  group_by(symbol) %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;yearly&quot;, 
+               type       = &quot;arithmetic&quot;,
+               col_rename = &quot;yearly_returns&quot;,
+               cols = c(nested.col))</code></pre>
+<p>Summarizing monthly returns for each of the stocks and <code>SPY</code>; min, max, median, mean, SD.</p>
+<pre class="r"><code>monthly_returns_summary &lt;- myStocks_returns_monthly %&gt;% 
+  group_by(symbol) %&gt;% 
+  summarise(mean_monthly_return = mean (monthly_returns, na.rm=TRUE),
+      median_monthly_return = median (monthly_returns, na.rm=TRUE),
+      sd_monthly_return = sd (monthly_returns, na.rm=TRUE),
+      min_monthly_return = min (monthly_returns, na.rm=TRUE),
+      max_monthly_return = max (monthly_returns, na.rm=TRUE))
+monthly_returns_summary</code></pre>
+<pre><code>## # A tibble: 6 × 6
+##   symbol mean_monthly_return median_monthly_return sd_monthly_…¹ min_m…² max_m…³
+##   &lt;chr&gt;                &lt;dbl&gt;                 &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 AAPL               0.0230                0.0230         0.0791  -0.181   0.217
+## 2 ANF                0.00337               0.00105        0.146   -0.421   0.507
+## 3 JPM                0.0119                0.0199         0.0727  -0.229   0.202
+## 4 SPY                0.0106                0.0146         0.0404  -0.125   0.127
+## 5 TSLA               0.0501                0.0117         0.177   -0.224   0.811
+## 6 XOM                0.00756               0.00373        0.0697  -0.262   0.241
+## # … with abbreviated variable names ¹​sd_monthly_return, ²​min_monthly_return,
+## #   ³​max_monthly_return</code></pre>
+<p>Density plot for each of the stocks:</p>
+<pre class="r"><code>plot1 &lt;- myStocks_returns_monthly %&gt;%
+  group_by(symbol) %&gt;% 
+  ggplot(aes(x = monthly_returns)) +
+   facet_wrap(~symbol, scales = &quot;free&quot;)+
+   geom_density()
+plot1</code></pre>
+<p><img src="/blogs/financial_files/figure-html/density_monthly_returns-1.png" width="648" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>We can see that most plots, apart from Apple and Tesla follow a normal distribution. We can also determine that TSLA is the stock with the highest risk. Not only is the distribution heavily skewed right, but the monthly retuns on the most likely return are lower than zero. XOM on the other hand is the least risky stock, as it’s density plot is heavily concentrated amongst one value, 0. Therefore we can infer that it’s variability is fairly low.</p>
+</blockquote>
+</div>
+<div id="risk-return" class="section level2">
+<h2>Risk &amp; Return</h2>
+<pre class="r"><code>plot2 &lt;- ggplot(data = monthly_returns_summary, mapping = aes(x = sd_monthly_return, y = mean_monthly_return)) +
+   geom_point() +
+   ggrepel::geom_text_repel(aes(label=symbol))+
+   labs(title = &quot;Risk/return by stock&quot;,
+        x = &quot;Risk&quot;,
+        y = &quot;Return&quot;)
+plot2</code></pre>
+<p><img src="/blogs/financial_files/figure-html/risk_return_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>As we can see based on this plot, higher return is typically correlated with higher risk. However, some stocks, like for example ANF, have higher risk without there being a significant increase in the returns. As an investor, you can use this graph to determine not to invest in a stock like ANF.</p>
+</blockquote>
+</div>
+</div>
