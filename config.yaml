@@ -71,10 +71,10 @@ params:
         url: '#'
       - name: Data analysis portfolio
         url: blogs
-      - name: Generic Blog
-        url: blogs/ipsum
-      - name: Elements
-        url: elements.html
+ #     - name: Generic Blog
+  #      url: blogs/ipsum
+   #   - name: Elements
+    #    url: elements.html
     menu: Menu
     subtitle: portfolio website
     title: Amelia Przybyl
