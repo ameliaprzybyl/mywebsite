@@ -62,7 +62,7 @@ params:
   navigation:
     button1:
       - name: Download cv
-        url: pdf_cv
+        url: /content/blogs/curriculumvitae.pdf
  #   button2:
   #    - name: Log In
         url: '#'

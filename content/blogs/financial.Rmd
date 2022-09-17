@@ -8,7 +8,7 @@ draft: false
 image: airport.jpg
 keywords: ""
 slug: financial
-title: Advanced Data Analysis
+title: Stock risk return analysis
 ---
 
 ```{r, setup, echo=FALSE}
@@ -41,7 +41,7 @@ library(tidyquant)
 
 # Returns of financial stocks
 
-> useful material [finance data sources](https://mam2023.netlify.app/reference/finance_data/).
+> I would like to study the risk and returns of six different stocks traded on the NYSE. Useful material [finance data sources](https://mam2023.netlify.app/reference/finance_data/).
 
 ```{r load_nyse_data, message=FALSE, warning=FALSE}
 nyse <- readr::read_csv(here::here("data","nyse.csv"))
@@ -69,7 +69,6 @@ ggplot(descending_sector, aes(x=reorder(sector, -n), y = n)) +
     y = "Number of companies")
 ```
 
-Next, let's choose some stocks and their ticker symbols and download some data. You **MUST** choose 6 different stocks from the ones listed below; You should, however, add `SPY` which is the SP500 ETF (Exchange Traded Fund).
 
 ## Picking stocks
 

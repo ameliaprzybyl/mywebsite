@@ -58,13 +58,6 @@ glimpse(approval_polllist)
 # Use `lubridate` to fix dates, as they are given as characters.
 ```
 
-What I would like you to do is to calculate the average net approval
-rate (approve - disapprove) for each week since he got into office. I
-want you plot the net approval for each week in 2022, along with its 95%
-confidence interval. There are various dates given for each poll, please
-use `enddate`, i.e., the date the poll ended. Your plot should look
-something like this:
-
 ## Create a plot
 
 What I would like to do is to calculate the average net approval
