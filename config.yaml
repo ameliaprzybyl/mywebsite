@@ -61,10 +61,10 @@ params:
   name: Amelia Przybyl
   navigation:
     button1:
-      - name: Get Started
-        url: blogs
-    button2:
-      - name: Log In
+      - name: Download cv
+        url: pdf_cv
+ #   button2:
+  #    - name: Log In
         url: '#'
     links:
       - name: Home
@@ -85,7 +85,7 @@ params:
         subtitle: Short bio
         title: About me
         url: blogs/about
-      - image: money.jpg
+      - image: grad.jpg
         subtitle: Find out more about my career trajectory
         title: CV
         url: blogs/cv
