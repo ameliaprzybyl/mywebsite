@@ -5,7 +5,7 @@ categories:
 date: "`r Sys.Date()`"
 description: ""
 draft: false
-image: washington.jpg
+image: vote.jpg
 keywords: ""
 slug: biden
 title: Biden's approval
