@@ -3,7 +3,7 @@ categories:
 - ""
 - ""
 date: "`r Sys.Date()`"
-description: ""
+description: "Analysis of weekly sales by department for 45 stores of a US retailer"
 draft: false
 image: capadoccia.jpg
 keywords: ""

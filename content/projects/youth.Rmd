@@ -3,7 +3,7 @@ categories:
 - ""
 - ""
 date: "`r Sys.Date()`"
-description: ""
+description: "Studying if physical activity influences weight"
 draft: false
 image: colombia.jpg
 keywords: ""
