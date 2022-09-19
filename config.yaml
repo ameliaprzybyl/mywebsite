@@ -102,9 +102,9 @@ params:
         title: Youth Risk Behavior Surveillance
         url: blogs/youth
       - image: capadoccia.jpg
-        subtitle: Project tbd
-        title: Final group project
-        url: blogs/final
+        subtitle: Analysis of weekly sales by department for 45 stores of a US retailer
+        title: Sales analysis
+        url: blogs/sales
   two:
     buttonText: See my work
     enable: yes
