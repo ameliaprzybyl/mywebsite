@@ -11,10 +11,6 @@ slug: sales
 title: Sales analysis
 ---
 
-We have been given the task to analyze the weekly sales by department for 45 stores of a US retailer.
-
-# Setup
-
 ```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(
   message = FALSE, 
@@ -52,6 +48,8 @@ library(infer)
 library(GGally)
 library(huxtable)
 ```
+
+We have been given the task to analyze the weekly sales by department for 45 stores of a US retailer.
 
 ## Import data
 
