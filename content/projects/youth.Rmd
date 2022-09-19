@@ -42,7 +42,7 @@ library(infer)
 library(openintro)
 ```
 
-# Youth Risk Behavior Surveillance
+# Studying youth risk behaviour 
 
 ## Load the data
 
