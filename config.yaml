@@ -20,7 +20,6 @@ params:
         title: Address
     buttonClear: Clear
     buttonSend: Send message
-     - url: formspree.io/f/xvoyklgo
     email:
       - email: aprzybyl.mam2023@london.edu
         title: Email
