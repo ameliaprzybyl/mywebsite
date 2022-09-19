@@ -5,7 +5,7 @@ categories:
 date: "`r Sys.Date()`"
 description: "Traching risk and returns of six selected stocks"
 draft: false
-image: finance.jpg
+image: ny.jpg
 keywords: ""
 slug: financial
 title: Risk return analysis

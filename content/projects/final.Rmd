@@ -5,7 +5,7 @@ categories:
 date: "`r Sys.Date()`"
 description: "Analysis of weekly sales by department for 45 stores of a US retailer"
 draft: false
-image: capadoccia.jpg
+image: sales.jpg
 keywords: ""
 slug: sales
 title: Sales analysis
