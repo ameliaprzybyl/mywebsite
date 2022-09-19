@@ -62,7 +62,7 @@ ggplot(descending_sector, aes(x=reorder(sector, -n), y = n)) +
   labs(title = &quot;Number of companies by sector&quot;,
     x = &quot;Sector&quot;,
     y = &quot;Number of companies&quot;)</code></pre>
-<p><img src="/blogs/financial_files/figure-html/companies_per_sector-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/blogs/projects/financial_files/figure-html/companies_per_sector-1.png" width="648" style="display: block; margin: auto;" /></p>
 </div>
 <div id="picking-stocks" class="section level2">
 <h2>Picking stocks</h2>
@@ -142,7 +142,7 @@ monthly_returns_summary</code></pre>
    facet_wrap(~symbol, scales = &quot;free&quot;)+
    geom_density()
 plot1</code></pre>
-<p><img src="/blogs/financial_files/figure-html/density_monthly_returns-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/blogs/projects/financial_files/figure-html/density_monthly_returns-1.png" width="648" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>We can see that most plots, apart from Apple and Tesla follow a normal distribution. We can also determine that TSLA is the stock with the highest risk. Not only is the distribution heavily skewed right, but the monthly retuns on the most likely return are lower than zero. XOM on the other hand is the least risky stock, as it’s density plot is heavily concentrated amongst one value, 0. Therefore we can infer that it’s variability is fairly low.</p>
 </blockquote>
@@ -156,7 +156,7 @@ plot1</code></pre>
         x = &quot;Risk&quot;,
         y = &quot;Return&quot;)
 plot2</code></pre>
-<p><img src="/blogs/financial_files/figure-html/risk_return_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/blogs/projects/financial_files/figure-html/risk_return_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>As we can see based on this plot, higher return is typically correlated with higher risk. However, some stocks, like for example ANF, have higher risk without there being a significant increase in the returns. As an investor, you can use this graph to determine not to invest in a stock like ANF.</p>
 </blockquote>

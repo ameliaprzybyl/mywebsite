@@ -70,7 +70,7 @@ params:
       - name: Home
         url: '#'
       - name: Data analysis portfolio
-        url: blogs
+        url: blogs/projects
  #     - name: Generic Blog
   #      url: blogs/ipsum
    #   - name: Elements
@@ -92,22 +92,22 @@ params:
       - image: airport.jpg
         subtitle: Risk return analysis
         title: Financial Analysis
-        url: blogs/financial
+        url: blogs/projects/financial
       - image: washington.jpg
         subtitle: Net approval ratings in 2022
         title: Biden's Approval
-        url: blogs/biden
+        url: blogs/projects/biden
       - image: colombia.jpg
         subtitle: Studying if physical activity influences weight
         title: Youth Risk Behavior Surveillance
-        url: blogs/youth
+        url: blogs/projects/youth
       - image: capadoccia.jpg
         subtitle: Analysis of weekly sales by department for 45 stores of a US retailer
         title: Sales analysis
-        url: blogs/sales
+        url: blogs/projects/sales
   two:
     buttonText: See my work
     enable: yes
     subtitle: "I recently started studying Analytics and Management at London Business School, where I am starting my journey with Data Science. Here is a sneak peak into what I have been working on so far."
     title: Welcome
-    url: blogs
+    url: blogs/projects
