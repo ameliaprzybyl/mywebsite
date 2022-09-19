@@ -20,7 +20,6 @@ params:
         title: Address
     buttonClear: Clear
     buttonSend: Send message
-     - formEmail: 'aprzybyl.mam2023@london.edu'
     email:
       - email: aprzybyl.mam2023@london.edu
         title: Email
