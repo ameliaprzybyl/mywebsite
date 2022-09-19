@@ -39,7 +39,7 @@ library(vroom)
 library(tidyquant)
 ```
 
-# Returns of financial stocks
+# Studying the risk and returns of financial stocks
 
 > I would like to study the risk and returns of six different stocks traded on the NYSE. Useful material [finance data sources](https://mam2023.netlify.app/reference/finance_data/).
 
