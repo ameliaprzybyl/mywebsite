@@ -65,7 +65,7 @@ params:
         url: blogs/curriculumvitae.pdf
  #   button2:
   #    - name: Log In
-        url: '#'
+ #       url: '#'
     links:
       - name: Home
         url: '#'
