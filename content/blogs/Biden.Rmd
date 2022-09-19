@@ -1,7 +1,7 @@
 ---
 title: "Biden's approval"
 date: "`r Sys.Date()`"
-description: ''
+description: "Tracking Biden's net approval ratings in 2022"
 image: vote.jpg
 keywords: ''
 slug: biden

@@ -14,6 +14,8 @@ slug: cv
 title: Curriculum Vitae
 ---
 
+Download the pdf version [here](https://ameliaprzybyl.netlify.app/blogs/curriculumvitae.pdf).
+
 ## Education
 
 | School                                           | Course                                | Time      |
