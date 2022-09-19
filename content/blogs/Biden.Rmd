@@ -1,16 +1,15 @@
 ---
-categories:
-- ""
-- ""
+title: "Biden's approval"
 date: "`r Sys.Date()`"
-description: ""
-draft: false
+description: ''
 image: vote.jpg
-keywords: ""
+keywords: ''
 slug: biden
-title: Biden's approval
+categories:
+- ''
+- ''
+draft: false
 ---
-
 
 ```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(
@@ -61,8 +60,7 @@ glimpse(approval_polllist)
 ## Create a plot
 
 What I would like to do is to calculate the average net approval
-rate (approve - disapprove) for each week since he got into office. Plot the net approval for each week in 2022, along with its 95%
-confidence interval.
+rate (approve - disapprove) for each week since he got into office. Plot the net approval for each week in 2022, along with its 95% confidence interval.
 
 ```{r approval_rate, out.width="100%"}
 

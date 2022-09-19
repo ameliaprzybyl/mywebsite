@@ -1,3 +1,10 @@
+base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
 tidyverse
 ggplot2
 tibble
@@ -17,9 +24,10 @@ lubridate
 here
 skimr
 janitor
-httr
-readxl
 vroom
-wbstats
-countrycode
-patchwork
+zoo
+xts
+PerformanceAnalytics
+TTR
+quantmod
+tidyquant
