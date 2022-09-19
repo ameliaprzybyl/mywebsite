@@ -292,7 +292,7 @@ glimpse(yrbss)</code></pre>
 
 ggplot(yrbss, aes(x=weight, na.rm=TRUE)) +
    geom_density() </code></pre>
-<p><img src="/blogs/projects/youth_files/figure-html/eda_on_weight-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/youth_files/figure-html/eda_on_weight-1.png" width="648" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>As we can see from the data, there are 1004 missing observations, the distribution is right skewed with its mean at 68kg and standard deviation at 17.</p>
 </blockquote>
@@ -350,7 +350,7 @@ print(CI_low)</code></pre>
     title = &quot;Boxplot of people active for more than 3 days vs weight&quot;,
     x = &quot;Are they active more than 3 times a week?&quot;,
     y = &quot;Weight&quot;)</code></pre>
-<p><img src="/blogs/projects/youth_files/figure-html/boxplot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/youth_files/figure-html/boxplot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>Based on this graph we can infer that there does not seem to be a relationship between weight and activity, which seems counterintuitive. This could point us to the fact that there is in fact another variable that influences your weight instead of physical activity, like for example consumption habits or genetics.</p>
 </blockquote>
@@ -431,11 +431,11 @@ print(CI_not_active)</code></pre>
 <p>Visualize the null distribution:</p>
 <pre class="r"><code>ggplot(data = null_dist, aes(x = stat)) +
   geom_histogram()</code></pre>
-<p><img src="/blogs/projects/youth_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/youth_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The p-value for the hypothesis test:</p>
 <pre class="r"><code>null_dist %&gt;% visualize() +
   shade_p_value(obs_stat = obs_diff, direction = &quot;two-sided&quot;)</code></pre>
-<p><img src="/blogs/projects/youth_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/youth_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>null_dist %&gt;%
   get_p_value(obs_stat = obs_diff, direction = &quot;two_sided&quot;)</code></pre>
 <pre><code>## # A tibble: 1 × 1

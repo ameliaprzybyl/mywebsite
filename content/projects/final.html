@@ -1549,7 +1549,7 @@ number_dept</code></pre>
   theme_bw() + 
   theme(axis.text = element_text(size = 8))
 g</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/num_dept_by_store-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/num_dept_by_store-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>whole %&gt;% 
   group_by(store) %&gt;% 
   summarize(n_department = n_distinct(dept)) %&gt;% 
@@ -1627,7 +1627,7 @@ size_sales</code></pre>
   scale_y_continuous(labels = scales::label_number(suffix = &quot;K&quot;, scale = 0.001)) + 
   labs(x = &quot;Type&quot;, y = &quot;Size (thousand)&quot;, title = &quot;Comparing store size by type&quot;)
 g1 / g3</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Which store had the most sales between weeks starting 07/01/2011 and 30/12/2011?</p>
 <p>What was the average sales per week?</p>
 <blockquote>
@@ -1672,7 +1672,7 @@ average_sales</code></pre>
   theme_bw() + 
   theme(axis.text = element_text(size = 8), 
         legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>What kind of distribution do store sales follow? Can you create a useful graph to show the spread of sales by store, ranked by median weekly sales?</p>
 <blockquote>
 <p>The stores sales distribution is right skewed for each year.
@@ -1687,7 +1687,7 @@ ggplot(data = whole, aes(x = weekly_sales)) +
   theme_bw() + 
   theme(axis.text = element_text(size = 8)) +
   facet_wrap(vars(year))</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/weekly_sales_distribution-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/weekly_sales_distribution-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>median_sales &lt;- whole %&gt;% 
   mutate(month = month(date, label = TRUE)) %&gt;%
   group_by(month, store) %&gt;% 
@@ -1711,7 +1711,7 @@ median_sales</code></pre>
 <pre class="r"><code>ggplot(data = median_sales, aes(x = sales)) + 
   geom_density() + 
   facet_wrap(~ month, nrow = 4)</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/median_sales_distribution_month-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/median_sales_distribution_month-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>  labs(x = &quot;Median Sales&quot;, 
        y = &quot;Density&quot;, 
        title = &quot;Distribution of Store Median Weekly Sales (divided by month)&quot;) + 
@@ -1730,7 +1730,7 @@ correlation between <code>mark_down1</code> and weekly sales = 0.179,</p>
   summarize(weekly_sales = sum(weekly_sales), 
             n_dept = n_distinct(dept)) %&gt;% 
   ggpairs()</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/corr_with_sales_detail-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/corr_with_sales_detail-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Are there any stores with mean sales during holiday periods lower than normal trading weeks?</p>
 <pre class="r"><code>whole %&gt;% 
   group_by(store, is_holiday, date) %&gt;% 
@@ -1940,10 +1940,10 @@ null_dist &lt;- n_vs_holiday %&gt;%
 </blockquote>
 <pre class="r"><code>ggplot(data = null_dist, aes(x = stat)) +
   geom_histogram()</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/visualize-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/visualize-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>visualize(null_dist) + 
   shade_p_value(obs_stat = obs_diff, direction = &quot;two_sided&quot;)</code></pre>
-<p><img src="/blogs/projects/final_files/figure-html/unnamed-chunk-6-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/final_files/figure-html/unnamed-chunk-6-1.png" width="648" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>We do not have enough evidence to reject the null hypothesis.
 The p-value is 0.874:</p>
