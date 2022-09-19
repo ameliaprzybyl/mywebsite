@@ -51,7 +51,7 @@ library(huxtable)
 
 We have been given the task to analyze the weekly sales by department for 45 stores of a US retailer.
 
-## Import data
+# Import data
 
 ```{r import}
 sales <- read_csv(here::here("data", "sales.csv")) %>% 
@@ -129,10 +129,6 @@ head(clean_stores)
 ```
 
 # Part A: Exploratory data analysis
-
-Articulate hypotheses as to what may be happening -- discuss with colleagues / experts EDA: correlation charts, histograms, scatter plots, etc
-
-***Questions:***
 
 How many more weeks of data are there in details.csv compared to sales.csv?
 

@@ -14,8 +14,8 @@ title: Sales analysis
 
 
 <p>We have been given the task to analyze the weekly sales by department for 45 stores of a US retailer.</p>
-<div id="import-data" class="section level2">
-<h2>Import data</h2>
+<div id="import-data" class="section level1">
+<h1>Import data</h1>
 <pre class="r"><code>sales &lt;- read_csv(here::here(&quot;data&quot;, &quot;sales.csv&quot;)) %&gt;% 
   janitor::clean_names()
 details &lt;- read_csv(here::here(&quot;data&quot;, &quot;details.csv&quot;)) %&gt;% 
@@ -1035,8 +1035,6 @@ clean_stores &lt;- stores</code></pre>
 </div>
 <div id="part-a-exploratory-data-analysis" class="section level1">
 <h1>Part A: Exploratory data analysis</h1>
-<p>Articulate hypotheses as to what may be happening – discuss with colleagues / experts EDA: correlation charts, histograms, scatter plots, etc</p>
-<p><strong><em>Questions:</em></strong></p>
 <p>How many more weeks of data are there in details.csv compared to sales.csv?</p>
 <blockquote>
 <p>the <strong>Details</strong> has 39 more weeks than the <strong>sales</strong></p>
